@@ -17,6 +17,7 @@ func main() {
 	r.GET("/books", controllers.GetAllBrands)
 	r.GET("/books/:id", controllers.FindById)
 	r.POST("/books", controllers.CreateBrand)
+	r.DELETE("/books/:id", controllers.DeleteBrand)
 
 	r.Run()
 }

@@ -48,3 +48,22 @@ func CreateBrand(c *gin.Context) {
 	c.JSON(http.StatusCreated, gin.H{"data": b})
 
 }
+
+func DeleteBrand(c *gin.Context) {
+
+	id := c.Param("id")
+
+	b := model.Brand{}
+
+	database.Database.Where("id=?", id).Find(&b)
+
+	err := database.Database.Delete(&b).Error
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"data": "Bir hata meydana geldi"})
+		return
+	}
+
+	c.JSON(http.StatusNoContent, gin.H{"data": ""})
+
+}
