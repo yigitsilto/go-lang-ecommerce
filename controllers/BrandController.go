@@ -1,27 +1,22 @@
 package controllers
 
 import (
-	"ecommerce/database"
 	"ecommerce/dto/brand"
-	"ecommerce/models"
+	"ecommerce/services"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
 
 func GetAllBrands(c *gin.Context) {
 
-	var brands []model.Brand
-
-	database.Database.Find(&brands)
+	brands := services.GetAllBrands()
 
 	c.JSON(http.StatusOK, gin.H{"data": brands})
 }
 
 func FindById(c *gin.Context) {
 
-	b := model.Brand{}
-
-	database.Database.Where("id=?", c.Param("id")).Find(&b)
+	b := services.FindBrandById(c.Param("id"))
 
 	c.JSON(http.StatusOK, gin.H{"data": b})
 
@@ -36,14 +31,7 @@ func CreateBrand(c *gin.Context) {
 		return
 	}
 
-	b := model.Brand{Title: input.Title}
-
-	err := database.Database.Create(&b).Error
-
-	if err != nil {
-		c.JSON(http.StatusConflict, gin.H{"data": "Böyle bir kayıt zaten var!"})
-		return
-	}
+	b := services.CreateBrand(input)
 
 	c.JSON(http.StatusCreated, gin.H{"data": b})
 
@@ -51,18 +39,7 @@ func CreateBrand(c *gin.Context) {
 
 func DeleteBrand(c *gin.Context) {
 
-	id := c.Param("id")
-
-	b := model.Brand{}
-
-	database.Database.Where("id=?", id).Find(&b)
-
-	err := database.Database.Delete(&b).Error
-
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"data": "Bir hata meydana geldi"})
-		return
-	}
+	services.DeleteBrand(c.Param("id"))
 
 	c.JSON(http.StatusNoContent, gin.H{"data": ""})
 
