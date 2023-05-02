@@ -16,25 +16,23 @@ func GetAllBrands() []model.Brand {
 
 }
 
-func FindBrandById(id string) model.Brand {
+func FindBrandById(id string) (model.Brand, error) {
 
-	brand := model.Brand{}
+	b := model.Brand{}
 
-	database.Database.Where("id=?", id).Find(&brand)
+	err := database.Database.Where("id=?", id).Find(&b).Error
 
-	return brand
+	return b, err
 
 }
 
-func CreateBrand(input brand.CreateBrandDTO) model.Brand {
+func CreateBrand(input brand.CreateBrandDTO) (model.Brand, error) {
 
 	b := model.Brand{Title: input.Title}
 
-	database.Database.Create(&b)
+	err := database.Database.Create(&b).Error
 
-	// TODO go error araştırması yapılacak!!
-
-	return b
+	return b, err
 
 }
 
@@ -45,4 +43,18 @@ func DeleteBrand(id string) {
 	database.Database.Where("id=?", id).Find(&b)
 
 	database.Database.Delete(&b)
+}
+
+func UpdateBrand(id string, input brand.CreateBrandDTO) (model.Brand, error) {
+
+	b := model.Brand{}
+
+	database.Database.Where("id=?", id).First(&b)
+
+	b.Title = input.Title
+
+	err := database.Database.Save(&b).Error
+
+	return b, err
+
 }
