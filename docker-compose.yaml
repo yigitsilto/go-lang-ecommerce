@@ -1,19 +1,32 @@
 version: '3.5'
 
 services:
-  postgres:
+  mysql:
     container_name: goLangEcommerce
-    image: postgres:latest
+    image: mysql:latest
     environment:
-      POSTGRES_USER: root
-      POSTGRES_PASSWORD: root
-      PGDATA: /data/postgres
+      MYSQL_ROOT_USER: root
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: fleetcart
     volumes:
-      - postgres-db:/data/postgres
+     # - mysql-db:/var/lib/mysql
+      - ./sql/:/docker-entrypoint-initdb.d
     ports:
-      - "5432:5432"
+      - "3306:3306"
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: pmadmin
+    links:
+      - mysql
+    environment:
+      PMA_HOST: mysql
+      MYSQL_ROOT_PASSWORD: root
+      PMA_PORT: 3306
+    restart: always
+    ports:
+      - "8001:80"
 
 
 volumes:
-  postgres-db:
+  mysql-db:
     driver: local

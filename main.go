@@ -3,7 +3,7 @@ package main
 import (
 	"ecommerce/controllers"
 	"ecommerce/database"
-	"ecommerce/models"
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 	"log"
@@ -14,18 +14,20 @@ func main() {
 	loadDatabase()
 	r := gin.Default()
 
-	r.GET("/books", controllers.GetAllBrands)
-	r.GET("/books/:id", controllers.FindById)
-	r.POST("/books", controllers.CreateBrand)
-	r.DELETE("/books/:id", controllers.DeleteBrand)
-	r.PUT("/books/:id", controllers.UpdateBrand)
+	// Enable CORS middleware
+	config := cors.DefaultConfig()
+	config.AllowOrigins = []string{"http://localhost:3000"}
+	r.Use(cors.New(config))
+
+	r.GET("/brands", controllers.GetAllBrands)
+	r.GET("/brands/:id", controllers.FindById)
 
 	r.Run()
 }
 
 func loadDatabase() {
 	database.Connect()
-	database.Database.AutoMigrate(&model.Brand{})
+	//database.Database.AutoMigrate(&model.Brand{})
 }
 
 func loadEnv() {
