@@ -21,7 +21,7 @@ func GetHomePage() (model.HomePageModel, error) {
 			"LEFT JOIN entity_files ef on ef.entity_type = 'Modules\\\\Product\\\\Entities\\\\Product' and ef.entity_id = products.id" +
 			" LEFT JOIN files f on f.id = ef.file_id INNER JOIN brands br ON br.id = products.brand_id " +
 			"INNER JOIN brand_translations brt ON brt.brand_id = br.id  ",
-	).Find(&popularProducts).Error
+	).Limit(20).Find(&popularProducts).Error
 
 	buildPopularProducts(popularProducts)
 
