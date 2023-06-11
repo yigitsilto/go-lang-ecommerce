@@ -1,13 +1,11 @@
 package main
 
 import (
-	"crypto/tls"
 	"ecommerce/database"
 	routes "ecommerce/routers"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 	"log"
-	"net/http"
 )
 
 func CORSMiddleware() gin.HandlerFunc {
@@ -39,27 +37,7 @@ func main() {
 
 	routes.RegisterRoutes(r)
 
-	// Sertifika ve anahtar dosyasının yolu
-	certFile := "cert.crt"
-	keyFile := "key.key"
-
-	// TLS yapılandırmasını ayarla
-	tlsConfig := &tls.Config{
-		MinVersion: tls.VersionTLS12,
-	}
-
-	// Sunucu oluştur ve çalıştır
-	server := &http.Server{
-		Addr:      ":8081",
-		Handler:   r,
-		TLSConfig: tlsConfig,
-	}
-
-	// HTTPS üzerinde 8080 portunda sunucuyu başlat
-	err := server.ListenAndServeTLS(certFile, keyFile)
-	if err != nil {
-		log.Fatal("Error starting server: ", err)
-	}
+	r.Run(":443")
 }
 
 func loadDatabase() {
