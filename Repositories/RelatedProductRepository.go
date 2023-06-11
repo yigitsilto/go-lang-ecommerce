@@ -13,7 +13,7 @@ func GetAllRelatedProducts() ([]model.RelatedProductsModel, error) {
 		Select(
 			"products.id, products.slug, products.short_desc, products.price, products.special_price, products.qty, products.in_stock," +
 				"GROUP_CONCAT(DISTINCT brt.name) AS brand_name, pt.name, " +
-				"GROUP_CONCAT(DISTINCT f.path) AS file_paths, products.is_active, popular_products.created_at, popular_products.updated_at",
+				"GROUP_CONCAT(DISTINCT f.path) AS path, products.is_active, popular_products.created_at, popular_products.updated_at",
 		).
 		Joins(
 			"INNER JOIN products ON products.id = popular_products.product_id " +
