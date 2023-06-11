@@ -40,8 +40,8 @@ func main() {
 	routes.RegisterRoutes(r)
 
 	// Sertifika ve anahtar dosyasının yolu
-	certFile := "./cert.crt"
-	keyFile := "./key.key"
+	certFile := "cert.crt"
+	keyFile := "key.key"
 
 	// TLS yapılandırmasını ayarla
 	tlsConfig := &tls.Config{
