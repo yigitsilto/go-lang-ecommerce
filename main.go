@@ -37,7 +37,7 @@ func main() {
 
 	routes.RegisterRoutes(r)
 
-	r.Run(":443")
+	r.Run(":8081")
 }
 
 func loadDatabase() {
