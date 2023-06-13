@@ -12,7 +12,7 @@ func GetAllBrands(c *gin.Context) {
 	brands, err := services.GetAllBrands()
 
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"data": exceptions.EntityNotFoundException.Error()})
+		c.JSON(http.StatusNotFound, gin.H{"data": exceptions.ServerError.Error()})
 		return
 	}
 
