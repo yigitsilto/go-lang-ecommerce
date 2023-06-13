@@ -5,19 +5,50 @@ import (
 	"ecommerce/database"
 	model "ecommerce/models"
 	"os"
+	"sync"
 )
 
 func GetHomePage() (model.HomePageModel, error) {
+	var wg sync.WaitGroup
 
-	popularProducts, err := Repositories.GetAllRelatedProducts()
+	var popularProducts []model.PopularProductsModel
+	var blogs []model.BlogModel
+	var sliders []model.Slider
 
-	blogs, err := getBlogsForHomePage() // get blogs
+	wg.Add(3)
 
-	sliders, err := getSlidersForHomePage() // get sliders
+	go func() {
+		defer wg.Done()
+		popularProducts, _ = Repositories.GetAllRelatedProducts()
+	}()
 
-	homePageModel := model.HomePageModel{Products: popularProducts, BlogModel: blogs, Slider: sliders}
+	go func() {
+		defer wg.Done()
+		blogs, _ = getBlogsForHomePage()
+	}()
 
-	return homePageModel, err
+	go func() {
+		defer wg.Done()
+		sliders, _ = getSlidersForHomePage()
+	}()
+
+	wg.Wait()
+
+	homePageModel := model.HomePageModel{
+		Products:  popularProducts,
+		BlogModel: blogs,
+		Slider:    sliders,
+	}
+
+	return homePageModel, nil
+}
+
+func getBlogsForHomePage() ([]model.BlogModel, error) {
+	var blogs []model.BlogModel
+
+	err := database.Database.Table("blogs").Limit(2).Find(&blogs).Error
+
+	return blogs, err
 }
 
 func getSlidersForHomePage() ([]model.Slider, error) {
@@ -28,15 +59,4 @@ func getSlidersForHomePage() ([]model.Slider, error) {
 	}
 
 	return sliders, err
-
-}
-
-func getBlogsForHomePage() ([]model.BlogModel, error) {
-
-	var blogs []model.BlogModel
-
-	err := database.Database.Table("blogs").Limit(2).Find(&blogs).Error
-
-	return blogs, err
-
 }

@@ -1,6 +1,6 @@
 package model
 
-type RelatedProductsModel struct {
+type PopularProductsModel struct {
 	BaseModel
 	Slug                  string  `gorm:"size:255;not null;unique" json:"slug"`
 	IsActive              int8    `gorm:"not null" json:"is_active"`
@@ -25,7 +25,7 @@ type BlogModel struct {
 }
 
 type HomePageModel struct {
-	Products  []RelatedProductsModel `json:"products"`
+	Products  []PopularProductsModel `json:"products"`
 	BlogModel []BlogModel            `json:"blogs"`
 	Slider    []Slider               `json:"sliders"`
 }

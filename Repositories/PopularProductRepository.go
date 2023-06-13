@@ -7,9 +7,9 @@ import (
 	"os"
 )
 
-func GetAllRelatedProducts() ([]model.RelatedProductsModel, error) {
+func GetAllRelatedProducts() ([]model.PopularProductsModel, error) {
 
-	popularProducts := []model.RelatedProductsModel{}
+	popularProducts := []model.PopularProductsModel{}
 
 	err := database.Database.Table("popular_products").
 		Select(
@@ -34,7 +34,7 @@ func GetAllRelatedProducts() ([]model.RelatedProductsModel, error) {
 
 }
 
-func buildPopularProducts(popularProducts []model.RelatedProductsModel) {
+func buildPopularProducts(popularProducts []model.PopularProductsModel) {
 	for index, product := range popularProducts {
 		popularProducts[index].PriceFormatted = fmt.Sprintf("%.2f TRY", product.Price)
 		popularProducts[index].SpecialPriceFormatted = fmt.Sprintf("%.2f TRY", product.SpecialPrice)
