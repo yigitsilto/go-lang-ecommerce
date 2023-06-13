@@ -13,10 +13,6 @@ func GetAllBrands() ([]model.Brand, error) {
 
 }
 
-func builPathValues([]model.Brand) {
-
-}
-
 func FindBrandById(id string) (model.Brand, error) {
 
 	b := model.Brand{}
