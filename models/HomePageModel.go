@@ -27,4 +27,11 @@ type BlogModel struct {
 type HomePageModel struct {
 	Products  []RelatedProductsModel `json:"products"`
 	BlogModel []BlogModel            `json:"blogs"`
+	Slider    []Slider               `json:"sliders"`
+}
+
+type Slider struct {
+	Id     int64  `json:"id"`
+	FileId int64  `json:"file_id"`
+	Path   string `json:"path"`
 }

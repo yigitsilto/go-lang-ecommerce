@@ -12,11 +12,13 @@ func GetHomePage() (model.HomePageModel, error) {
 
 	popularProducts, err := Repositories.GetAllRelatedProducts()
 
-	buildPopularProducts(popularProducts)
+	buildPopularProducts(popularProducts) // build popular products array
 
-	blogs, err := getBlogsForHomePage()
+	blogs, err := getBlogsForHomePage() // get blogs
 
-	homePageModel := model.HomePageModel{Products: popularProducts, BlogModel: blogs}
+	sliders, err := getSlidersForHomePage() // get sliders
+
+	homePageModel := model.HomePageModel{Products: popularProducts, BlogModel: blogs, Slider: sliders}
 
 	return homePageModel, err
 }
@@ -29,9 +31,20 @@ func buildPopularProducts(popularProducts []model.RelatedProductsModel) {
 	}
 }
 
+func getSlidersForHomePage() ([]model.Slider, error) {
+	sliders, err := Repositories.GetAllSliders()
+
+	for index, slider := range sliders {
+		sliders[index].Path = os.Getenv("IMAGE_APP_URL") + slider.Path
+	}
+
+	return sliders, err
+
+}
+
 func getBlogsForHomePage() ([]model.BlogModel, error) {
 
-	blogs := []model.BlogModel{}
+	var blogs []model.BlogModel
 
 	err := database.Database.Table("blogs").Limit(2).Find(&blogs).Error
 
