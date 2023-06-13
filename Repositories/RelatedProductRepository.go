@@ -3,6 +3,8 @@ package Repositories
 import (
 	"ecommerce/database"
 	model "ecommerce/models"
+	"fmt"
+	"os"
 )
 
 func GetAllRelatedProducts() ([]model.RelatedProductsModel, error) {
@@ -21,11 +23,21 @@ func GetAllRelatedProducts() ([]model.RelatedProductsModel, error) {
 				"LEFT JOIN entity_files ef ON ef.entity_type = 'Modules\\\\Product\\\\Entities\\\\Product' AND ef.entity_id = products.id and ef.zone = 'base_image' " +
 				"LEFT JOIN files f ON f.id = ef.file_id " +
 				"INNER JOIN brands br ON br.id = products.brand_id " +
-				"INNER JOIN brand_translations brt ON brt.brand_id = br.id",
+				"INNER JOIN brand_translations brt ON brt.brand_id = br.id WHERE products.is_active = true",
 		).
 		Limit(20).
 		Find(&popularProducts).Error
 
+	buildPopularProducts(popularProducts)
+
 	return popularProducts, err
 
+}
+
+func buildPopularProducts(popularProducts []model.RelatedProductsModel) {
+	for index, product := range popularProducts {
+		popularProducts[index].PriceFormatted = fmt.Sprintf("%.2f TRY", product.Price)
+		popularProducts[index].SpecialPriceFormatted = fmt.Sprintf("%.2f TRY", product.SpecialPrice)
+		popularProducts[index].Path = os.Getenv("IMAGE_APP_URL") + product.Path
+	}
 }
