@@ -5,9 +5,9 @@ import (
 	model "ecommerce/models"
 )
 
-func GetProductsByBrand(slug string, page int) (model.Pagination, error) {
+func GetProductsByBrand(slug string, page int, orderBy string) (model.Pagination, error) {
 
-	products, err := Repositories.FindPageableProductsByBrandSlug(slug, page)
+	products, err := Repositories.FindPageableProductsByBrandSlug(slug, page, orderBy)
 
 	return products, err
 

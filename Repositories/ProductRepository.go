@@ -7,7 +7,7 @@ import (
 	"os"
 )
 
-func FindPageableProductsByBrandSlug(slug string, page int) (model.Pagination, error) {
+func FindPageableProductsByBrandSlug(slug string, page int, orderBy string) (model.Pagination, error) {
 
 	if page < 1 {
 		page = 1
@@ -33,9 +33,9 @@ func FindPageableProductsByBrandSlug(slug string, page int) (model.Pagination, e
 				"INNER JOIN brand_translations brt ON brt.brand_id = br.id",
 		).
 		Where("products.is_active = true AND br.slug = ?", slug).
-		Order("products.created_at").
 		Offset(offset).
 		Limit(perPage).
+		Order(buildOrderByValues(orderBy)).
 		Find(&products).Error
 
 	buildProducts(products)
@@ -62,7 +62,6 @@ func ProductsByBrandCount(slug string) int64 {
 				"INNER JOIN brand_translations brt ON brt.brand_id = br.id",
 		).
 		Where("products.is_active = true AND br.slug = ?", slug).
-		Order("products.created_at").
 		Count(&count)
 
 	return count
@@ -87,5 +86,20 @@ func buildProducts(products []model.Product) {
 		products[index].PriceFormatted = fmt.Sprintf("%.2f TRY", product.Price)
 		products[index].SpecialPriceFormatted = fmt.Sprintf("%.2f TRY", product.SpecialPrice)
 		products[index].Path = os.Getenv("IMAGE_APP_URL") + product.Path
+	}
+}
+
+func buildOrderByValues(orderBy string) string {
+	switch orderBy {
+	case "orderByPriceAsc":
+		return "products.price asc"
+	case "orderByPriceDesc":
+		return " products.price desc"
+	case "orderByNameAsc":
+		return "pt.name asc"
+	case "orderByNameDesc":
+		return " pt.name desc"
+	default:
+		return " products.created_at"
 	}
 }

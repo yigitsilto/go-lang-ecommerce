@@ -12,7 +12,7 @@ func GetProductsByBrand(c *gin.Context) {
 
 	page, err := strconv.Atoi(c.Query("page"))
 
-	products, err := services.GetProductsByBrand(c.Param("slug"), page)
+	products, err := services.GetProductsByBrand(c.Param("slug"), page, c.Query("order"))
 
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"data": exceptions.ServerError.Error()})
