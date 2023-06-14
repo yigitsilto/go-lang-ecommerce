@@ -5,11 +5,14 @@ import (
 	"ecommerce/services"
 	"github.com/gin-gonic/gin"
 	"net/http"
+	"strconv"
 )
 
-func GetAllProducts(c *gin.Context) {
+func GetProductsByBrand(c *gin.Context) {
 
-	products, err := services.GetAllProducts()
+	page, err := strconv.Atoi(c.Query("page"))
+
+	products, err := services.GetProductsByBrand(c.Param("slug"), page)
 
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"data": exceptions.ServerError.Error()})

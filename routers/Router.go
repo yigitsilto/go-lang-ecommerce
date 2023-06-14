@@ -11,7 +11,7 @@ func RegisterRoutes(router *gin.Engine) {
 	router.GET("/api/brands/:id", controllers.FindById)
 
 	// Register the routers for products.
-	router.GET("/api/products", controllers.GetAllProducts)
+	router.GET("/api/productsByBrand/:slug", controllers.GetProductsByBrand)
 	router.GET("/api/products/:id", controllers.FindProductById)
 	router.GET("/api/homePage", controllers.GetHomePage)
 }
