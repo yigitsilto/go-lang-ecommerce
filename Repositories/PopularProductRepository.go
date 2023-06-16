@@ -13,7 +13,7 @@ func GetAllRelatedProducts() ([]model.PopularProductsModel, error) {
 
 	err := database.Database.Table("popular_products").
 		Select(
-			"products.id, products.slug, products.short_desc, products.price, products.special_price, products.qty, products.in_stock," +
+			"products.id, products.slug, products.short_desc as short_description, products.price, products.special_price, products.qty, products.in_stock," +
 				" brt.name AS brand_name, pt.name, " +
 				" f.path AS path, products.is_active, popular_products.created_at, popular_products.updated_at",
 		).
