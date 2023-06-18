@@ -52,8 +52,8 @@ func GetAllRelatedProductsWithUserSpecialPrices(companyGroupId float64) ([]model
 				"LEFT JOIN entity_files ef ON ef.entity_type = 'Modules\\\\Product\\\\Entities\\\\Product' AND ef.entity_id = products.id and ef.zone = 'base_image' "+
 				"LEFT JOIN files f ON f.id = ef.file_id "+
 				"INNER JOIN brands br ON br.id = products.brand_id "+
-				"INNER JOIN brand_translations brt ON brt.brand_id = br.id WHERE products.is_active = true order by rand() "+
-				"INNER JOIN product_prices pp ON pp.product_id = products.id AND pp.company_price_id  <=  ? AND pp.price != 0 ",
+				"INNER JOIN brand_translations brt ON brt.brand_id = br.id WHERE products.is_active = true "+
+				"INNER JOIN product_prices pp ON pp.product_id = products.id AND pp.company_price_id  <=  ? AND pp.price != 0  order by rand() ",
 			groupCompanyIdInt,
 		).
 		Limit(100).
