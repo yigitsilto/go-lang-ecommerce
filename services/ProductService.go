@@ -15,7 +15,7 @@ func GetProductsByBrand(slug string, page int, orderBy string, user *model.User)
 		return products, err
 	}
 
-	products, err := Repositories.FindPageableProductsByBrandSlugWithUserPrices(slug, page, orderBy, user.Group)
+	products, err := Repositories.FindPageableProductsByBrandSlugWithUserPrices(slug, page, orderBy, userInformation)
 
 	return products, err
 

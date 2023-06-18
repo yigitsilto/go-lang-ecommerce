@@ -112,9 +112,11 @@ func GetUsersCompanyGroup(user *model.User) (float64, error) {
 	}
 	userInformation := model.UserInformation{}
 
-	err := database.Database.Table("users").Select("users.email, users.company_group_id ").Find(
-		&userInformation, "email =?", user.Email,
-	).Error
+	err := database.Database.Table("users").Select("users.email, c.company_price_id as company_group_id ").
+		Joins("INNER JOIN company c ON c.id = users.company_group_id ").
+		Find(
+			&userInformation, "email =?", user.Email,
+		).Error
 
 	return userInformation.CompanyGroupId, err
 

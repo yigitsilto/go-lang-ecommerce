@@ -23,7 +23,7 @@ func GetHomePage(user *model.User) (model.HomePageModel, error) {
 		if err != nil || userInformation == 0 {
 			popularProducts, _ = Repositories.GetAllRelatedProducts()
 		} else {
-			popularProducts, _ = Repositories.GetAllRelatedProductsWithUserSpecialPrices(user.Group)
+			popularProducts, _ = Repositories.GetAllRelatedProductsWithUserSpecialPrices(userInformation)
 		}
 
 	}()
