@@ -8,7 +8,7 @@ import (
 	"sync"
 )
 
-func GetHomePage() (model.HomePageModel, error) {
+func GetHomePage(user *model.User) (model.HomePageModel, error) {
 	var wg sync.WaitGroup
 
 	var popularProducts []model.PopularProductsModel
@@ -19,7 +19,13 @@ func GetHomePage() (model.HomePageModel, error) {
 
 	go func() {
 		defer wg.Done()
-		popularProducts, _ = Repositories.GetAllRelatedProducts()
+		userInformation, err := Repositories.GetUsersCompanyGroup(user)
+		if err != nil || userInformation == 0 {
+			popularProducts, _ = Repositories.GetAllRelatedProducts()
+		} else {
+			popularProducts, _ = Repositories.GetAllRelatedProductsWithUserSpecialPrices(userInformation)
+		}
+
 	}()
 
 	go func() {

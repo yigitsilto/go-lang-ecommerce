@@ -9,6 +9,7 @@ type PopularProductsModel struct {
 	Path                  string  `json:"path"`
 	Qty                   int     `json:"qty"`
 	InStock               bool    `json:"in_stock"`
+	CompanyPriceId        int     `json:"company_price_id"`
 	Price                 float64 `gorm:"type:decimal(18,4) unsigned" json:"price"`
 	PriceFormatted        string  `json:"price_formatted"`
 	SpecialPrice          float64 `gorm:"type:decimal(18,4) unsigned" json:"special_price"`
