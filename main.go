@@ -2,6 +2,7 @@ package main
 
 import (
 	"ecommerce/database"
+	"ecommerce/middleware"
 	routes "ecommerce/routers"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
@@ -34,6 +35,7 @@ func main() {
 	r := gin.Default()
 
 	r.Use(CORSMiddleware())
+	r.Use(middleware.AuthMiddleware)
 
 	routes.RegisterRoutes(r)
 

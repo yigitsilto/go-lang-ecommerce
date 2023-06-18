@@ -40,9 +40,83 @@ func FindPageableProductsByBrandSlug(slug string, page int, orderBy string) (mod
 
 	buildProducts(products)
 
-	pagination := model.Pagination{TotalRows: ProductsByBrandCount(slug), Data: products}
+	pagination := model.Pagination{Data: products}
 
 	return pagination, err
+
+}
+
+func FindPageableProductsByBrandSlugWithUserPrices(
+	slug string, page int, orderBy string, groupCompanyId float64,
+) (model.Pagination, error) {
+
+	groupCompanyIdInt := int(groupCompanyId)
+
+	if page < 1 {
+		page = 1
+	}
+	perPage := 60
+
+	// Sayfalama işlemi için offset hesapla
+	offset := (page - 1) * perPage
+
+	var products []model.Product
+
+	err := database.Database.Table("products").
+		Select(
+			"products.id, products.slug, products.short_desc, pp.price as price, pp.company_price_id, products.special_price, products.qty, products.in_stock,"+
+				" brt.name AS brand_name, pt.name, "+
+				" f.path AS path, products.is_active, products.created_at, products.updated_at",
+		).
+		Joins(
+			"INNER JOIN product_translations pt ON pt.product_id = products.id "+
+				"LEFT JOIN entity_files ef ON ef.entity_type = 'Modules\\\\Product\\\\Entities\\\\Product' AND ef.entity_id = products.id and ef.zone = 'base_image' "+
+				"LEFT JOIN files f ON f.id = ef.file_id "+
+				"INNER JOIN brands br ON br.id = products.brand_id "+
+				"INNER JOIN brand_translations brt ON brt.brand_id = br.id "+
+				"INNER JOIN product_prices pp ON pp.product_id = products.id AND pp.company_price_id  <=  ? AND pp.price != 0 ",
+			groupCompanyIdInt,
+		).
+		Where("products.is_active = true AND br.slug = ?", slug).
+		Offset(offset).
+		Limit(perPage).
+		Order(buildOrderByValues(orderBy)).
+		Find(&products).Error
+
+	productMap := make(map[int]model.Product)
+	for _, product := range products {
+		existingProduct, ok := productMap[product.ID]
+		if !ok || product.CompanyPriceId > existingProduct.CompanyPriceId {
+			productMap[product.ID] = product
+		}
+	}
+
+	// Sonuçları al
+	var uniqueProducts []model.Product
+	for _, product := range productMap {
+		uniqueProducts = append(uniqueProducts, product)
+	}
+
+	buildProducts(uniqueProducts)
+
+	pagination := model.Pagination{Data: uniqueProducts}
+
+	return pagination, err
+
+}
+
+func GetUsersCompanyGroup(user *model.User) (float64, error) {
+
+	if user.Group == 0 {
+		return 0, nil
+	}
+	userInformation := model.UserInformation{}
+
+	err := database.Database.Table("users").Select("users.email, users.company_group_id ").Find(
+		&userInformation, "email =?", user.Email,
+	).Error
+
+	return userInformation.CompanyGroupId, err
 
 }
 
