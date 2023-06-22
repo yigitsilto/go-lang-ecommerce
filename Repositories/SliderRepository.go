@@ -5,7 +5,14 @@ import (
 	model "ecommerce/models"
 )
 
-func GetAllSliders() ([]model.Slider, error) {
+type SliderRepository interface {
+	GetAllSliders() ([]model.Slider, error)
+}
+
+type SliderRepositoryImpl struct {
+}
+
+func (s *SliderRepositoryImpl) GetAllSliders() ([]model.Slider, error) {
 
 	sliders := []model.Slider{}
 

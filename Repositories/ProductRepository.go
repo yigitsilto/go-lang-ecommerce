@@ -7,7 +7,21 @@ import (
 	"os"
 )
 
-func FindPageableProductsByBrandSlug(slug string, page int, orderBy string) (model.Pagination, error) {
+type ProductRepository interface {
+	FindPageableProductsByBrandSlug(slug string, page int, orderBy string) (model.Pagination, error)
+	FindPageableProductsByBrandSlugWithUserPrices(
+		slug string, page int, orderBy string, groupCompanyId float64,
+	) (model.Pagination, error)
+	GetUsersCompanyGroup(user *model.User) (float64, error)
+	FindProductById(id string) (model.Product, error)
+}
+
+type ProductRepositoryImpl struct {
+}
+
+func (p *ProductRepositoryImpl) FindPageableProductsByBrandSlug(
+	slug string, page int, orderBy string,
+) (model.Pagination, error) {
 
 	if page < 1 {
 		page = 1
@@ -46,7 +60,7 @@ func FindPageableProductsByBrandSlug(slug string, page int, orderBy string) (mod
 
 }
 
-func FindPageableProductsByBrandSlugWithUserPrices(
+func (p *ProductRepositoryImpl) FindPageableProductsByBrandSlugWithUserPrices(
 	slug string, page int, orderBy string, groupCompanyId float64,
 ) (model.Pagination, error) {
 
@@ -105,7 +119,7 @@ func FindPageableProductsByBrandSlugWithUserPrices(
 
 }
 
-func GetUsersCompanyGroup(user *model.User) (float64, error) {
+func (p *ProductRepositoryImpl) GetUsersCompanyGroup(user *model.User) (float64, error) {
 
 	if user.Group == 0 {
 		return 0, nil
@@ -122,28 +136,7 @@ func GetUsersCompanyGroup(user *model.User) (float64, error) {
 
 }
 
-func ProductsByBrandCount(slug string) int64 {
-	var count int64
-	database.Database.Table("products").
-		Select(
-			"products.id, products.slug, products.short_desc, products.price, products.special_price, products.qty, products.in_stock,"+
-				" brt.name AS brand_name, pt.name, "+
-				" f.path AS path, products.is_active, products.created_at, products.updated_at",
-		).
-		Joins(
-			"INNER JOIN product_translations pt ON pt.product_id = products.id "+
-				"LEFT JOIN entity_files ef ON ef.entity_type = 'Modules\\\\Product\\\\Entities\\\\Product' AND ef.entity_id = products.id and ef.zone = 'base_image' "+
-				"LEFT JOIN files f ON f.id = ef.file_id "+
-				"INNER JOIN brands br ON br.id = products.brand_id "+
-				"INNER JOIN brand_translations brt ON brt.brand_id = br.id",
-		).
-		Where("products.is_active = true AND br.slug = ?", slug).
-		Count(&count)
-
-	return count
-}
-
-func FindProductById(id string) (model.Product, error) {
+func (p *ProductRepositoryImpl) FindProductById(id string) (model.Product, error) {
 
 	product := model.Product{}
 

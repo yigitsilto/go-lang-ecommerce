@@ -7,7 +7,15 @@ import (
 	"os"
 )
 
-func GetAllRelatedProducts() ([]model.PopularProductsModel, error) {
+type PopularProductRepository interface {
+	GetAllRelatedProducts() ([]model.PopularProductsModel, error)
+	GetAllRelatedProductsWithUserSpecialPrices(companyGroupId float64) ([]model.PopularProductsModel, error)
+}
+
+type PopularProductRepositoryImpl struct {
+}
+
+func (pp *PopularProductRepositoryImpl) GetAllRelatedProducts() ([]model.PopularProductsModel, error) {
 
 	popularProducts := []model.PopularProductsModel{}
 
@@ -34,7 +42,9 @@ func GetAllRelatedProducts() ([]model.PopularProductsModel, error) {
 
 }
 
-func GetAllRelatedProductsWithUserSpecialPrices(companyGroupId float64) ([]model.PopularProductsModel, error) {
+func (pp *PopularProductRepositoryImpl) GetAllRelatedProductsWithUserSpecialPrices(companyGroupId float64) (
+	[]model.PopularProductsModel, error,
+) {
 
 	groupCompanyIdInt := int(companyGroupId)
 

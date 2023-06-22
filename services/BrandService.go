@@ -12,11 +12,18 @@ type BrandService interface {
 }
 
 type BrandServiceImpl struct {
+	repository Repositories.BrandRepository
+}
+
+func NewBrandService(repository Repositories.BrandRepository) BrandService {
+	return &BrandServiceImpl{
+		repository: repository,
+	}
 }
 
 func (s *BrandServiceImpl) GetAllBrands() ([]model.Brand, error) {
 
-	brands, err := Repositories.FindAllBrands()
+	brands, err := s.repository.FindAllBrands()
 	return brands, err
 
 }

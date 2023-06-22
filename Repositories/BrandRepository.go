@@ -6,7 +6,13 @@ import (
 	"os"
 )
 
-func FindAllBrands() ([]model.Brand, error) {
+type BrandRepository interface {
+	FindAllBrands() ([]model.Brand, error)
+}
+
+type BrandRepositoryImpl struct{}
+
+func (b *BrandRepositoryImpl) FindAllBrands() ([]model.Brand, error) {
 
 	brands := []model.Brand{}
 

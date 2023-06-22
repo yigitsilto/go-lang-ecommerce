@@ -11,7 +11,9 @@ type BrandController struct {
 	brandService services.BrandService
 }
 
-func NewBrandController(brandService services.BrandService) *BrandController {
+func NewBrandController(
+	brandService services.BrandService,
+) *BrandController {
 	return &BrandController{
 		brandService: brandService,
 	}

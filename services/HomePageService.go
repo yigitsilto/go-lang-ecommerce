@@ -14,7 +14,21 @@ type HomePageService interface {
 	getSlidersForHomePage() ([]model.Slider, error)
 }
 
-type HomePageServiceImpl struct{}
+type HomePageServiceImpl struct {
+	sliderRepository         Repositories.SliderRepository
+	popularProductRepository Repositories.PopularProductRepository
+	productRepository        Repositories.ProductRepository
+}
+
+func NewHomePageService(
+	repository Repositories.SliderRepository, popularProductsRepository Repositories.PopularProductRepository,
+	productRepository Repositories.ProductRepository,
+) HomePageService {
+	return &HomePageServiceImpl{
+		sliderRepository: repository, popularProductRepository: popularProductsRepository,
+		productRepository: productRepository,
+	}
+}
 
 func (h *HomePageServiceImpl) GetHomePage(user *model.User) (model.HomePageModel, error) {
 	var wg sync.WaitGroup
@@ -27,11 +41,11 @@ func (h *HomePageServiceImpl) GetHomePage(user *model.User) (model.HomePageModel
 
 	go func() {
 		defer wg.Done()
-		userInformation, err := Repositories.GetUsersCompanyGroup(user)
+		userInformation, err := h.productRepository.GetUsersCompanyGroup(user)
 		if err != nil || userInformation == 0 {
-			popularProducts, _ = Repositories.GetAllRelatedProducts()
+			popularProducts, _ = h.popularProductRepository.GetAllRelatedProducts()
 		} else {
-			popularProducts, _ = Repositories.GetAllRelatedProductsWithUserSpecialPrices(userInformation)
+			popularProducts, _ = h.popularProductRepository.GetAllRelatedProductsWithUserSpecialPrices(userInformation)
 		}
 
 	}()
@@ -66,7 +80,7 @@ func (h *HomePageServiceImpl) getBlogsForHomePage() ([]model.BlogModel, error) {
 }
 
 func (h *HomePageServiceImpl) getSlidersForHomePage() ([]model.Slider, error) {
-	sliders, err := Repositories.GetAllSliders()
+	sliders, err := h.sliderRepository.GetAllSliders()
 
 	for index, slider := range sliders {
 		sliders[index].Path = os.Getenv("IMAGE_APP_URL") + slider.Path
