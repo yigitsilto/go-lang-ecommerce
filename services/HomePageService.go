@@ -8,7 +8,15 @@ import (
 	"sync"
 )
 
-func GetHomePage(user *model.User) (model.HomePageModel, error) {
+type HomePageService interface {
+	GetHomePage(user *model.User) (model.HomePageModel, error)
+	getBlogsForHomePage() ([]model.BlogModel, error)
+	getSlidersForHomePage() ([]model.Slider, error)
+}
+
+type HomePageServiceImpl struct{}
+
+func (h *HomePageServiceImpl) GetHomePage(user *model.User) (model.HomePageModel, error) {
 	var wg sync.WaitGroup
 
 	var popularProducts []model.PopularProductsModel
@@ -30,12 +38,12 @@ func GetHomePage(user *model.User) (model.HomePageModel, error) {
 
 	go func() {
 		defer wg.Done()
-		blogs, _ = getBlogsForHomePage()
+		blogs, _ = h.getBlogsForHomePage()
 	}()
 
 	go func() {
 		defer wg.Done()
-		sliders, _ = getSlidersForHomePage()
+		sliders, _ = h.getSlidersForHomePage()
 	}()
 
 	wg.Wait()
@@ -49,7 +57,7 @@ func GetHomePage(user *model.User) (model.HomePageModel, error) {
 	return homePageModel, nil
 }
 
-func getBlogsForHomePage() ([]model.BlogModel, error) {
+func (h *HomePageServiceImpl) getBlogsForHomePage() ([]model.BlogModel, error) {
 	var blogs []model.BlogModel
 
 	err := database.Database.Table("blogs").Limit(2).Find(&blogs).Error
@@ -57,7 +65,7 @@ func getBlogsForHomePage() ([]model.BlogModel, error) {
 	return blogs, err
 }
 
-func getSlidersForHomePage() ([]model.Slider, error) {
+func (h *HomePageServiceImpl) getSlidersForHomePage() ([]model.Slider, error) {
 	sliders, err := Repositories.GetAllSliders()
 
 	for index, slider := range sliders {

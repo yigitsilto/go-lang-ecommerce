@@ -6,14 +6,22 @@ import (
 	model "ecommerce/models"
 )
 
-func GetAllBrands() ([]model.Brand, error) {
+type BrandService interface {
+	GetAllBrands() ([]model.Brand, error)
+	FindBrandById(id string) (model.Brand, error)
+}
+
+type BrandServiceImpl struct {
+}
+
+func (s *BrandServiceImpl) GetAllBrands() ([]model.Brand, error) {
 
 	brands, err := Repositories.FindAllBrands()
 	return brands, err
 
 }
 
-func FindBrandById(id string) (model.Brand, error) {
+func (s *BrandServiceImpl) FindBrandById(id string) (model.Brand, error) {
 
 	b := model.Brand{}
 

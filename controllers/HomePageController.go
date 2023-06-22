@@ -8,7 +8,17 @@ import (
 	"net/http"
 )
 
-func GetHomePage(c *gin.Context) {
+type HomePageController struct {
+	homePageService services.HomePageService
+}
+
+func NewHomePageController(homePageService services.HomePageService) *HomePageController {
+	return &HomePageController{
+		homePageService: homePageService,
+	}
+}
+
+func (h *HomePageController) GetHomePage(c *gin.Context) {
 
 	user, _ := c.Get("user")
 	authUser := model.User{}
@@ -16,7 +26,7 @@ func GetHomePage(c *gin.Context) {
 		authUser = user.(model.User)
 	}
 
-	homePageModel, err := services.GetHomePage(&authUser)
+	homePageModel, err := h.homePageService.GetHomePage(&authUser)
 
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"data": exceptions.ServerError.Error()})

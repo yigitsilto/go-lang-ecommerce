@@ -7,9 +7,19 @@ import (
 	"net/http"
 )
 
-func GetAllBrands(c *gin.Context) {
+type BrandController struct {
+	brandService services.BrandService
+}
 
-	brands, err := services.GetAllBrands()
+func NewBrandController(brandService services.BrandService) *BrandController {
+	return &BrandController{
+		brandService: brandService,
+	}
+}
+
+func (h *BrandController) GetAllBrands(c *gin.Context) {
+
+	brands, err := h.brandService.GetAllBrands()
 
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"data": exceptions.ServerError.Error()})
@@ -19,9 +29,9 @@ func GetAllBrands(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"data": brands})
 }
 
-func FindById(c *gin.Context) {
+func (h *BrandController) FindById(c *gin.Context) {
 
-	b, err := services.FindBrandById(c.Param("id"))
+	b, err := h.brandService.FindBrandById(c.Param("id"))
 
 	if err != nil || b.Slug == "" {
 		c.JSON(http.StatusNotFound, gin.H{"data": exceptions.EntityNotFoundException.Error()})

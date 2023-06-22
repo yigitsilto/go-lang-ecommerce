@@ -5,7 +5,16 @@ import (
 	model "ecommerce/models"
 )
 
-func GetProductsByBrand(slug string, page int, orderBy string, user *model.User) (model.Pagination, error) {
+type ProductService interface {
+	GetProductsByBrand(slug string, page int, orderBy string, user *model.User) (model.Pagination, error)
+	FindProductById(id string) (model.Product, error)
+}
+
+type ProductServiceImpl struct{}
+
+func (p *ProductServiceImpl) GetProductsByBrand(
+	slug string, page int, orderBy string, user *model.User,
+) (model.Pagination, error) {
 
 	userInformation, err := Repositories.GetUsersCompanyGroup(user)
 	if err != nil || userInformation == 0 {
@@ -21,7 +30,7 @@ func GetProductsByBrand(slug string, page int, orderBy string, user *model.User)
 
 }
 
-func FindProductById(id string) (model.Product, error) {
+func (p *ProductServiceImpl) FindProductById(id string) (model.Product, error) {
 
 	product, err := Repositories.FindProductById(id)
 

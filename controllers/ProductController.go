@@ -9,7 +9,15 @@ import (
 	"strconv"
 )
 
-func GetProductsByBrand(c *gin.Context) {
+type ProductController struct {
+	productService services.ProductService
+}
+
+func NewProductController(productService services.ProductService) *ProductController {
+	return &ProductController{productService: productService}
+}
+
+func (p *ProductController) GetProductsByBrand(c *gin.Context) {
 
 	page, err := strconv.Atoi(c.Query("page"))
 	user, _ := c.Get("user")
@@ -18,7 +26,7 @@ func GetProductsByBrand(c *gin.Context) {
 		authUser = user.(model.User)
 	}
 
-	products, err := services.GetProductsByBrand(c.Param("slug"), page, c.Query("order"), &authUser)
+	products, err := p.productService.GetProductsByBrand(c.Param("slug"), page, c.Query("order"), &authUser)
 
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"data": exceptions.ServerError.Error()})
@@ -29,9 +37,9 @@ func GetProductsByBrand(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"data": products})
 }
 
-func FindProductById(c *gin.Context) {
+func (p *ProductController) FindProductById(c *gin.Context) {
 
-	product, err := services.FindProductById(c.Param("id"))
+	product, err := p.productService.FindProductById(c.Param("id"))
 
 	if err != nil || product.Slug == "" {
 		c.JSON(http.StatusNotFound, gin.H{"data": exceptions.EntityNotFoundException.Error()})
