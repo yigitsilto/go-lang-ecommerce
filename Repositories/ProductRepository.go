@@ -1,7 +1,6 @@
 package Repositories
 
 import (
-	"ecommerce/database"
 	model "ecommerce/models"
 	"fmt"
 	"gorm.io/gorm"
@@ -39,7 +38,7 @@ func (p *ProductRepositoryImpl) FindPageableProductsByBrandSlug(
 
 	var products []model.Product
 
-	err := database.Database.Table("products").
+	err := p.db.Table("products").
 		Select(
 			"products.id, products.slug, products.short_desc, products.price, products.special_price, products.qty, products.in_stock,"+
 				" brt.name AS brand_name, pt.name, "+
@@ -82,7 +81,7 @@ func (p *ProductRepositoryImpl) FindPageableProductsByBrandSlugWithUserPrices(
 
 	var products []model.Product
 
-	err := database.Database.Table("products").
+	err := p.db.Table("products").
 		Select(
 			"products.id, products.slug, products.short_desc, pp.price as price, pp.company_price_id, products.special_price, products.qty, products.in_stock,"+
 				" brt.name AS brand_name, pt.name, "+
@@ -132,7 +131,7 @@ func (p *ProductRepositoryImpl) GetUsersCompanyGroup(user *model.User) (float64,
 	}
 	userInformation := model.UserInformation{}
 
-	err := database.Database.Table("users").Select("users.email, c.company_price_id as company_group_id ").
+	err := p.db.Table("users").Select("users.email, c.company_price_id as company_group_id ").
 		Joins("INNER JOIN company c ON c.id = users.company_group_id ").
 		Find(
 			&userInformation, "email =?", user.Email,
@@ -146,7 +145,7 @@ func (p *ProductRepositoryImpl) FindProductById(id string) (model.Product, error
 
 	product := model.Product{}
 
-	err := database.Database.Table("products").Select("*").Joins(
+	err := p.db.Table("products").Select("*").Joins(
 		" INNER JOIN product_translations pt on pt.product_id = products.id "+
 			"INNER JOIN entity_files ef on ef.entity_type = 'Modules\\\\Product\\\\Entities\\\\Product' and ef.entity_id = products.id"+
 			" INNER JOIN files f on f.id = ef.file_id",

@@ -1,7 +1,6 @@
 package Repositories
 
 import (
-	"ecommerce/database"
 	model "ecommerce/models"
 	"fmt"
 	"gorm.io/gorm"
@@ -25,7 +24,7 @@ func (pp *PopularProductRepositoryImpl) GetAllRelatedProducts() ([]model.Popular
 
 	popularProducts := []model.PopularProductsModel{}
 
-	err := database.Database.Table("popular_products").
+	err := pp.db.Table("popular_products").
 		Select(
 			"products.id, products.slug, products.short_desc as short_description, products.price, products.special_price, products.qty, products.in_stock," +
 				" brt.name AS brand_name, pt.name, " +
@@ -56,7 +55,7 @@ func (pp *PopularProductRepositoryImpl) GetAllRelatedProductsWithUserSpecialPric
 
 	popularProducts := []model.PopularProductsModel{}
 
-	err := database.Database.Table("popular_products").
+	err := pp.db.Table("popular_products").
 		Select(
 			"products.id, products.slug, products.short_desc as short_description, pp.price as price, pp.company_price_id, products.special_price, products.qty, products.in_stock,"+
 				" brt.name AS brand_name, pt.name, "+
