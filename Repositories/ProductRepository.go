@@ -4,6 +4,7 @@ import (
 	"ecommerce/database"
 	model "ecommerce/models"
 	"fmt"
+	"gorm.io/gorm"
 	"os"
 )
 
@@ -17,6 +18,11 @@ type ProductRepository interface {
 }
 
 type ProductRepositoryImpl struct {
+	db *gorm.DB
+}
+
+func NewProductRepository(db *gorm.DB) ProductRepository {
+	return &ProductRepositoryImpl{db: db}
 }
 
 func (p *ProductRepositoryImpl) FindPageableProductsByBrandSlug(

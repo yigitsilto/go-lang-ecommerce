@@ -4,6 +4,7 @@ import (
 	"ecommerce/database"
 	model "ecommerce/models"
 	"fmt"
+	"gorm.io/gorm"
 	"os"
 )
 
@@ -13,6 +14,11 @@ type PopularProductRepository interface {
 }
 
 type PopularProductRepositoryImpl struct {
+	db *gorm.DB
+}
+
+func NewPopularProductRepository(db *gorm.DB) PopularProductRepository {
+	return &PopularProductRepositoryImpl{db: db}
 }
 
 func (pp *PopularProductRepositoryImpl) GetAllRelatedProducts() ([]model.PopularProductsModel, error) {

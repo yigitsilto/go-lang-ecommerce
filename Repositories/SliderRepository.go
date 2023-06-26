@@ -1,8 +1,8 @@
 package Repositories
 
 import (
-	"ecommerce/database"
 	model "ecommerce/models"
+	"gorm.io/gorm"
 )
 
 type SliderRepository interface {
@@ -10,13 +10,20 @@ type SliderRepository interface {
 }
 
 type SliderRepositoryImpl struct {
+	db *gorm.DB
 }
 
+func NewSliderRepository(db *gorm.DB) SliderRepository {
+	return &SliderRepositoryImpl{
+		db: db,
+	}
+
+}
 func (s *SliderRepositoryImpl) GetAllSliders() ([]model.Slider, error) {
 
 	sliders := []model.Slider{}
 
-	err := database.Database.Table("sliders").
+	err := s.db.Table("sliders").
 		Select("sliders.id, f.path, sst.file_id").
 		Joins(
 			"inner join slider_slides ss on sliders.id = ss.slider_id " +

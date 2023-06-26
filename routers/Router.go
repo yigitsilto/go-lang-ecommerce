@@ -3,21 +3,23 @@ package routes
 import (
 	"ecommerce/Repositories"
 	"ecommerce/controllers"
+	"ecommerce/database"
 	"ecommerce/services"
 	"github.com/gin-gonic/gin"
 )
 
 func RegisterRoutes(router *gin.Engine) {
+	db := database.Database
 
 	// dependency injections for brands
-	brandRepository := &Repositories.BrandRepositoryImpl{}
+	brandRepository := Repositories.NewBrandRepository(db)
 	brandService := services.NewBrandService(brandRepository)
 	brandController := controllers.NewBrandController(brandService)
 
 	// dependency injections for homePage
-	sliderRepository := &Repositories.SliderRepositoryImpl{}
-	productRepository := &Repositories.ProductRepositoryImpl{}
-	popularProductsRepository := &Repositories.PopularProductRepositoryImpl{}
+	sliderRepository := Repositories.NewSliderRepository(db)
+	productRepository := Repositories.NewProductRepository(db)
+	popularProductsRepository := Repositories.NewPopularProductRepository(db)
 	homePageService := services.NewHomePageService(sliderRepository, popularProductsRepository, productRepository)
 	homePageController := controllers.NewHomePageController(homePageService)
 
