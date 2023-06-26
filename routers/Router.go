@@ -2,6 +2,7 @@ package routes
 
 import (
 	"ecommerce/Repositories"
+	"ecommerce/config"
 	"ecommerce/controllers"
 	"ecommerce/database"
 	"ecommerce/services"
@@ -10,6 +11,7 @@ import (
 
 func RegisterRoutes(router *gin.Engine) {
 	db := database.Database
+	redisClient := config.NewRedisClient()
 
 	// dependency injections for brands
 	brandRepository := Repositories.NewBrandRepository(db)
@@ -20,7 +22,9 @@ func RegisterRoutes(router *gin.Engine) {
 	sliderRepository := Repositories.NewSliderRepository(db)
 	productRepository := Repositories.NewProductRepository(db)
 	popularProductsRepository := Repositories.NewPopularProductRepository(db)
-	homePageService := services.NewHomePageService(sliderRepository, popularProductsRepository, productRepository)
+	homePageService := services.NewHomePageService(
+		sliderRepository, popularProductsRepository, productRepository, redisClient,
+	)
 	homePageController := controllers.NewHomePageController(homePageService)
 
 	// dependency injections for products
