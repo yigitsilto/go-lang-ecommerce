@@ -3,7 +3,6 @@ package services
 import (
 	"ecommerce/Repositories"
 	"ecommerce/config"
-	"ecommerce/database"
 	model "ecommerce/models"
 	"encoding/json"
 	"os"
@@ -20,17 +19,20 @@ type HomePageServiceImpl struct {
 	sliderRepository         Repositories.SliderRepository
 	popularProductRepository Repositories.PopularProductRepository
 	productRepository        Repositories.ProductRepository
+	blogRepository           Repositories.BlogRepository
 	redis                    *config.RedisClient
 }
 
 func NewHomePageService(
 	repository Repositories.SliderRepository, popularProductsRepository Repositories.PopularProductRepository,
 	productRepository Repositories.ProductRepository,
+	blogRepository Repositories.BlogRepository,
 	redisClient *config.RedisClient,
 ) HomePageService {
 	return &HomePageServiceImpl{
 		sliderRepository: repository, popularProductRepository: popularProductsRepository,
 		productRepository: productRepository,
+		blogRepository:    blogRepository,
 		redis:             redisClient,
 	}
 }
@@ -91,7 +93,7 @@ func (h *HomePageServiceImpl) GetHomePage(user *model.User) (model.HomePageModel
 func (h *HomePageServiceImpl) getBlogsForHomePage() ([]model.BlogModel, error) {
 	var blogs []model.BlogModel
 
-	err := database.Database.Table("blogs").Limit(2).Find(&blogs).Error
+	blogs, err := h.blogRepository.GetBlogsForHomePage()
 
 	return blogs, err
 }

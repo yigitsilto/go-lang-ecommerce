@@ -19,11 +19,12 @@ func RegisterRoutes(router *gin.Engine) {
 	brandController := controllers.NewBrandController(brandService)
 
 	// dependency injections for homePage
+	blogRepository := Repositories.NewBlogRepository(db)
 	sliderRepository := Repositories.NewSliderRepository(db)
 	productRepository := Repositories.NewProductRepository(db)
 	popularProductsRepository := Repositories.NewPopularProductRepository(db)
 	homePageService := services.NewHomePageService(
-		sliderRepository, popularProductsRepository, productRepository, redisClient,
+		sliderRepository, popularProductsRepository, productRepository, blogRepository, redisClient,
 	)
 	homePageController := controllers.NewHomePageController(homePageService)
 
