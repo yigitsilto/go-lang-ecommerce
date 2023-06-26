@@ -2,6 +2,7 @@ package config
 
 import (
 	"github.com/go-redis/redis"
+	"os"
 	"time"
 )
 
@@ -12,8 +13,8 @@ type RedisClient struct {
 func NewRedisClient() *RedisClient {
 	client := redis.NewClient(
 		&redis.Options{
-			Addr:     "localhost:6379",
-			Password: "root",
+			Addr:     os.Getenv("REDIS_ADDR"),
+			Password: os.Getenv("REDIS_PASSWORD"),
 			DB:       1,
 		},
 	)
