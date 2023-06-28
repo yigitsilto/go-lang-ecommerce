@@ -41,9 +41,9 @@ func (p *ProductController) GetProductsByBrand(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"data": products})
 }
 
-func (p *ProductController) FindProductById(c *gin.Context) {
+func (p *ProductController) FindProductBySlug(c *gin.Context) {
 
-	product, err := p.productService.FindProductById(c.Param("id"))
+	product, err := p.productService.FindProductBySlug(c.Param("id"))
 
 	if err != nil || product.Slug == "" {
 		c.JSON(http.StatusNotFound, gin.H{"data": exceptions.EntityNotFoundException.Error()})

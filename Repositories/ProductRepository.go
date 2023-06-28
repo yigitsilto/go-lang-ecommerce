@@ -15,7 +15,7 @@ type ProductRepository interface {
 		dto.Pagination, error,
 	)
 	GetUsersCompanyGroup(user *dto.User) (float64, error)
-	FindProductById(id string) (dto.Product, error)
+	FindProductBySlug(id string) (dto.Product, error)
 	FindPageableProductsByCategorySlug(
 		slug string, page int, filterBy string, order string, groupCompanyId float64,
 	) (dto.Pagination, error)
@@ -181,7 +181,7 @@ func (p *ProductRepositoryImpl) GetUsersCompanyGroup(user *dto.User) (float64, e
 
 }
 
-func (p *ProductRepositoryImpl) FindProductById(id string) (dto.Product, error) {
+func (p *ProductRepositoryImpl) FindProductBySlug(slug string) (dto.Product, error) {
 
 	product := dto.Product{}
 
@@ -189,7 +189,7 @@ func (p *ProductRepositoryImpl) FindProductById(id string) (dto.Product, error) 
 		" INNER JOIN product_translations pt on pt.product_id = products.id "+
 			"INNER JOIN entity_files ef on ef.entity_type = 'Modules\\\\Product\\\\Entities\\\\Product' and ef.entity_id = products.id"+
 			" INNER JOIN files f on f.id = ef.file_id",
-	).Where("products.id=?", id).Find(&product).Error
+	).Where("products.slug=?", slug).Find(&product).Error
 
 	return product, err
 

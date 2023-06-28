@@ -44,11 +44,8 @@ func (h *HomePageServiceImpl) GetHomePage(user *dto.User) (dto.HomePageModel, er
 	var sliders []dto.Slider
 
 	userInformation, err := h.productRepository.GetUsersCompanyGroup(user)
-	if err != nil || userInformation == 0 {
-		popularProducts, _ = h.popularProductRepository.GetAllRelatedProducts()
-	} else {
-		popularProducts, _ = h.popularProductRepository.GetAllRelatedProductsWithUserSpecialPrices(userInformation)
-	}
+
+	popularProducts, _ = h.popularProductRepository.GetAllRelatedProducts(userInformation)
 
 	homePageFromCache, err := h.retrieveDataFromCache(blogs, sliders)
 
