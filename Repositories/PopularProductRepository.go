@@ -1,7 +1,7 @@
 package Repositories
 
 import (
-	model "ecommerce/models"
+	model "ecommerce/dto"
 	"fmt"
 	"gorm.io/gorm"
 	"os"

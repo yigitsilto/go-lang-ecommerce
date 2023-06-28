@@ -2,14 +2,14 @@ package services
 
 import (
 	"ecommerce/Repositories"
-	model "ecommerce/models"
+	"ecommerce/dto"
 )
 
 type ProductService interface {
-	GetProductsByBrand(slug string, page int, orderBy string, user *model.User) (model.Pagination, error)
-	FindProductById(id string) (model.Product, error)
-	GetProductsByCategorySlug(slug string, page int, filterBy string, order string, user *model.User) (
-		model.Pagination, error,
+	GetProductsByBrand(slug string, page int, orderBy string, user *dto.User) (dto.Pagination, error)
+	FindProductById(id string) (dto.Product, error)
+	GetProductsByCategorySlug(slug string, page int, filterBy string, order string, user *dto.User) (
+		dto.Pagination, error,
 	)
 }
 
@@ -22,8 +22,8 @@ func NewProductService(productRepository Repositories.ProductRepository) Product
 }
 
 func (p *ProductServiceImpl) GetProductsByBrand(
-	slug string, page int, orderBy string, user *model.User,
-) (model.Pagination, error) {
+	slug string, page int, orderBy string, user *dto.User,
+) (dto.Pagination, error) {
 
 	userInformation, err := p.productRepository.GetUsersCompanyGroup(user)
 	products, err := p.productRepository.FindPageableProductsByBrandSlug(slug, page, orderBy, userInformation)
@@ -32,7 +32,7 @@ func (p *ProductServiceImpl) GetProductsByBrand(
 
 }
 
-func (p *ProductServiceImpl) FindProductById(id string) (model.Product, error) {
+func (p *ProductServiceImpl) FindProductById(id string) (dto.Product, error) {
 
 	product, err := p.productRepository.FindProductById(id)
 
@@ -40,8 +40,8 @@ func (p *ProductServiceImpl) FindProductById(id string) (model.Product, error) {
 }
 
 func (p *ProductServiceImpl) GetProductsByCategorySlug(
-	slug string, page int, filterBy string, order string, user *model.User,
-) (model.Pagination, error) {
+	slug string, page int, filterBy string, order string, user *dto.User,
+) (dto.Pagination, error) {
 
 	userInformation, err := p.productRepository.GetUsersCompanyGroup(user)
 

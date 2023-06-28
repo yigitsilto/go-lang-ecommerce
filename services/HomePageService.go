@@ -3,16 +3,16 @@ package services
 import (
 	"ecommerce/Repositories"
 	"ecommerce/config"
-	model "ecommerce/models"
+	"ecommerce/dto"
 	"encoding/json"
 	"os"
 	"sync"
 )
 
 type HomePageService interface {
-	GetHomePage(user *model.User) (model.HomePageModel, error)
-	getBlogsForHomePage() ([]model.BlogModel, error)
-	getSlidersForHomePage() ([]model.Slider, error)
+	GetHomePage(user *dto.User) (dto.HomePageModel, error)
+	getBlogsForHomePage() ([]dto.BlogModel, error)
+	getSlidersForHomePage() ([]dto.Slider, error)
 }
 
 type HomePageServiceImpl struct {
@@ -37,11 +37,11 @@ func NewHomePageService(
 	}
 }
 
-func (h *HomePageServiceImpl) GetHomePage(user *model.User) (model.HomePageModel, error) {
+func (h *HomePageServiceImpl) GetHomePage(user *dto.User) (dto.HomePageModel, error) {
 
-	var popularProducts []model.PopularProductsModel
-	var blogs []model.BlogModel
-	var sliders []model.Slider
+	var popularProducts []dto.PopularProductsModel
+	var blogs []dto.BlogModel
+	var sliders []dto.Slider
 
 	homePageFromCache, err := h.retrieveDataFromCache(blogs, sliders)
 
@@ -53,21 +53,21 @@ func (h *HomePageServiceImpl) GetHomePage(user *model.User) (model.HomePageModel
 	}
 
 	if err == nil {
-		return model.HomePageModel{
+		return dto.HomePageModel{
 			Products: popularProducts, Slider: homePageFromCache.Slider, BlogModel: homePageFromCache.BlogModel,
 		}, nil
 	}
 
 	homePageModel, err := h.retrieveDataFromDatabase(blogs, sliders, user)
 
-	return model.HomePageModel{
+	return dto.HomePageModel{
 		Products: popularProducts, Slider: homePageModel.Slider, BlogModel: homePageModel.BlogModel,
 	}, err
 }
 
 func (h *HomePageServiceImpl) retrieveDataFromDatabase(
-	blogs []model.BlogModel, sliders []model.Slider, user *model.User,
-) (model.HomePageModel, error) {
+	blogs []dto.BlogModel, sliders []dto.Slider, user *dto.User,
+) (dto.HomePageModel, error) {
 	var wg sync.WaitGroup
 
 	wg.Add(2)
@@ -88,7 +88,7 @@ func (h *HomePageServiceImpl) retrieveDataFromDatabase(
 
 	wg.Wait()
 
-	homePageModel := model.HomePageModel{
+	homePageModel := dto.HomePageModel{
 		BlogModel: blogs,
 		Slider:    sliders,
 	}
@@ -97,15 +97,15 @@ func (h *HomePageServiceImpl) retrieveDataFromDatabase(
 
 }
 
-func (h *HomePageServiceImpl) getBlogsForHomePage() ([]model.BlogModel, error) {
-	var blogs []model.BlogModel
+func (h *HomePageServiceImpl) getBlogsForHomePage() ([]dto.BlogModel, error) {
+	var blogs []dto.BlogModel
 
 	blogs, err := h.blogRepository.GetBlogsForHomePage()
 
 	return blogs, err
 }
 
-func (h *HomePageServiceImpl) getSlidersForHomePage() ([]model.Slider, error) {
+func (h *HomePageServiceImpl) getSlidersForHomePage() ([]dto.Slider, error) {
 	sliders, err := h.sliderRepository.GetAllSliders()
 
 	for index, slider := range sliders {
@@ -116,22 +116,22 @@ func (h *HomePageServiceImpl) getSlidersForHomePage() ([]model.Slider, error) {
 }
 
 func (h *HomePageServiceImpl) retrieveDataFromCache(
-	blogs []model.BlogModel, sliders []model.Slider,
-) (model.HomePageModel, error) {
+	blogs []dto.BlogModel, sliders []dto.Slider,
+) (dto.HomePageModel, error) {
 	blogsFromCache, err := h.redis.Get("blogs")
 	slidersFromCache, err := h.redis.Get("sliders")
 
 	if err != nil {
-		return model.HomePageModel{}, err
+		return dto.HomePageModel{}, err
 	}
 	err = json.Unmarshal([]byte(blogsFromCache), &blogs)
 	err = json.Unmarshal([]byte(slidersFromCache), &sliders)
 
 	if err != nil {
-		return model.HomePageModel{}, err
+		return dto.HomePageModel{}, err
 	}
 
-	homePageModel := model.HomePageModel{
+	homePageModel := dto.HomePageModel{
 		BlogModel: blogs,
 		Slider:    sliders,
 	}

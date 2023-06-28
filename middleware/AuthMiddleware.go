@@ -1,7 +1,7 @@
 package middleware
 
 import (
-	model "ecommerce/models"
+	model "ecommerce/dto"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
 	"net/http"

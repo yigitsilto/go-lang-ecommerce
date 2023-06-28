@@ -1,8 +1,8 @@
 package controllers
 
 import (
+	model "ecommerce/dto"
 	"ecommerce/exceptions"
-	model "ecommerce/models"
 	"ecommerce/services"
 	"github.com/gin-gonic/gin"
 	"net/http"

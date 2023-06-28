@@ -1,7 +1,7 @@
 package Repositories
 
 import (
-	model "ecommerce/models"
+	"ecommerce/dto"
 	"fmt"
 	"gorm.io/gorm"
 	"os"
@@ -11,13 +11,14 @@ import (
 
 type ProductRepository interface {
 	FindPageableProductsByBrandSlug(slug string, page int, orderBy string, groupCompanyId float64) (
-		model.Pagination, error,
+		dto.Pagination, error,
 	)
-	GetUsersCompanyGroup(user *model.User) (float64, error)
-	FindProductById(id string) (model.Product, error)
+	GetUsersCompanyGroup(user *dto.User) (float64, error)
+	FindProductById(id string) (dto.Product, error)
 	FindPageableProductsByCategorySlug(
 		slug string, page int, filterBy string, order string, groupCompanyId float64,
-	) (model.Pagination, error)
+	) (dto.Pagination, error)
+	GetFiltersForProduct()
 }
 
 type ProductRepositoryImpl struct {
@@ -28,9 +29,14 @@ func NewProductRepository(db *gorm.DB) ProductRepository {
 	return &ProductRepositoryImpl{db: db}
 }
 
+func (p *ProductRepositoryImpl) GetFiltersForProduct() {
+	//TODO implement me
+	panic("implement me")
+}
+
 func (p *ProductRepositoryImpl) FindPageableProductsByBrandSlug(
 	slug string, page int, orderBy string, groupCompanyId float64,
-) (model.Pagination, error) {
+) (dto.Pagination, error) {
 	groupCompanyIdInt := int(groupCompanyId)
 
 	if page < 1 {
@@ -40,7 +46,7 @@ func (p *ProductRepositoryImpl) FindPageableProductsByBrandSlug(
 	perPage := 12
 	offset := (page - 1) * perPage
 
-	var products []model.Product
+	var products []dto.Product
 
 	query := p.db.Table("products").
 		Select(
@@ -85,14 +91,14 @@ func (p *ProductRepositoryImpl) FindPageableProductsByBrandSlug(
 
 	buildProducts(products)
 
-	pagination := model.Pagination{Data: products}
+	pagination := dto.Pagination{Data: products}
 
 	return pagination, err
 }
 
-func uniqueProductsWithPriceCalculation(products []model.Product, orderBy string) []model.Product {
-	productMap := make(map[int]model.Product)
-	var uniqueProducts []model.Product
+func uniqueProductsWithPriceCalculation(products []dto.Product, orderBy string) []dto.Product {
+	productMap := make(map[int]dto.Product)
+	var uniqueProducts []dto.Product
 
 	// Sıralama işlevlerini depolamak için bir map oluştur
 	sortFuncMap := map[string]func(i, j int) bool{
@@ -129,12 +135,12 @@ func uniqueProductsWithPriceCalculation(products []model.Product, orderBy string
 	return uniqueProducts
 }
 
-func (p *ProductRepositoryImpl) GetUsersCompanyGroup(user *model.User) (float64, error) {
+func (p *ProductRepositoryImpl) GetUsersCompanyGroup(user *dto.User) (float64, error) {
 
 	if user.Group == 0 {
 		return 0, nil
 	}
-	userInformation := model.UserInformation{}
+	userInformation := dto.UserInformation{}
 
 	err := p.db.Table("users").Select("users.email, c.company_price_id as company_group_id ").
 		Joins("INNER JOIN company c ON c.id = users.company_group_id ").
@@ -146,9 +152,9 @@ func (p *ProductRepositoryImpl) GetUsersCompanyGroup(user *model.User) (float64,
 
 }
 
-func (p *ProductRepositoryImpl) FindProductById(id string) (model.Product, error) {
+func (p *ProductRepositoryImpl) FindProductById(id string) (dto.Product, error) {
 
-	product := model.Product{}
+	product := dto.Product{}
 
 	err := p.db.Table("products").Select("*").Joins(
 		" INNER JOIN product_translations pt on pt.product_id = products.id "+
@@ -160,7 +166,7 @@ func (p *ProductRepositoryImpl) FindProductById(id string) (model.Product, error
 
 }
 
-func buildProducts(products []model.Product) {
+func buildProducts(products []dto.Product) {
 	for index, product := range products {
 		products[index].PriceFormatted = fmt.Sprintf("%.2f TRY", product.Price)
 		products[index].SpecialPriceFormatted = fmt.Sprintf("%.2f TRY", product.SpecialPrice)
@@ -185,7 +191,7 @@ func buildOrderByValues(orderBy string) string {
 
 func (p *ProductRepositoryImpl) FindPageableProductsByCategorySlug(
 	slug string, page int, filterBy string, order string, groupCompanyId float64,
-) (model.Pagination, error) {
+) (dto.Pagination, error) {
 
 	groupCompanyIdInt := int(groupCompanyId)
 
@@ -193,7 +199,7 @@ func (p *ProductRepositoryImpl) FindPageableProductsByCategorySlug(
 	err := p.db.Select("id").Table("categories").Where("slug = ?", slug).Scan(&id).Error
 
 	if err != nil {
-		return model.Pagination{}, err
+		return dto.Pagination{}, err
 	}
 
 	if page < 1 {
@@ -204,7 +210,7 @@ func (p *ProductRepositoryImpl) FindPageableProductsByCategorySlug(
 	// Sayfalama işlemi için offset hesapla
 	offset := (page - 1) * perPage
 
-	var products []model.Product
+	var products []dto.Product
 
 	query := p.db.Table("products").
 		Select(
@@ -259,7 +265,7 @@ func (p *ProductRepositoryImpl) FindPageableProductsByCategorySlug(
 
 	buildProducts(products)
 
-	pagination := model.Pagination{Data: products}
+	pagination := dto.Pagination{Data: products}
 
 	return pagination, err
 

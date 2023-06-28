@@ -1,4 +1,4 @@
-package model
+package dto
 
 type Pagination struct {
 	//TotalRows int64       `json:"total_rows"`

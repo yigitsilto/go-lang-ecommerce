@@ -3,7 +3,7 @@ package services
 import (
 	"ecommerce/Repositories"
 	"ecommerce/database"
-	model "ecommerce/models"
+	model "ecommerce/dto"
 )
 
 type BrandService interface {
