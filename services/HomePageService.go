@@ -38,32 +38,39 @@ func NewHomePageService(
 }
 
 func (h *HomePageServiceImpl) GetHomePage(user *model.User) (model.HomePageModel, error) {
-	var wg sync.WaitGroup
 
 	var popularProducts []model.PopularProductsModel
 	var blogs []model.BlogModel
 	var sliders []model.Slider
 
-	homePageFromCache, err := h.retrieveDataFromCache(blogs, sliders, popularProducts)
+	homePageFromCache, err := h.retrieveDataFromCache(blogs, sliders)
 
-	if err == nil {
-		return homePageFromCache, nil
+	userInformation, err := h.productRepository.GetUsersCompanyGroup(user)
+	if err != nil || userInformation == 0 {
+		popularProducts, _ = h.popularProductRepository.GetAllRelatedProducts()
+	} else {
+		popularProducts, _ = h.popularProductRepository.GetAllRelatedProductsWithUserSpecialPrices(userInformation)
 	}
 
-	wg.Add(3)
+	if err == nil {
+		return model.HomePageModel{
+			Products: popularProducts, Slider: homePageFromCache.Slider, BlogModel: homePageFromCache.BlogModel,
+		}, nil
+	}
 
-	go func() {
-		defer wg.Done()
-		userInformation, err := h.productRepository.GetUsersCompanyGroup(user)
-		if err != nil || userInformation == 0 {
-			popularProducts, _ = h.popularProductRepository.GetAllRelatedProducts()
-		} else {
-			popularProducts, _ = h.popularProductRepository.GetAllRelatedProductsWithUserSpecialPrices(userInformation)
-		}
-		popularProductsCache, _ := json.Marshal(popularProducts)
-		h.redis.Set("products", string(popularProductsCache))
+	homePageModel, err := h.retrieveDataFromDatabase(blogs, sliders, user)
 
-	}()
+	return model.HomePageModel{
+		Products: popularProducts, Slider: homePageModel.Slider, BlogModel: homePageModel.BlogModel,
+	}, err
+}
+
+func (h *HomePageServiceImpl) retrieveDataFromDatabase(
+	blogs []model.BlogModel, sliders []model.Slider, user *model.User,
+) (model.HomePageModel, error) {
+	var wg sync.WaitGroup
+
+	wg.Add(2)
 
 	go func() {
 		defer wg.Done()
@@ -82,12 +89,12 @@ func (h *HomePageServiceImpl) GetHomePage(user *model.User) (model.HomePageModel
 	wg.Wait()
 
 	homePageModel := model.HomePageModel{
-		Products:  popularProducts,
 		BlogModel: blogs,
 		Slider:    sliders,
 	}
 
 	return homePageModel, nil
+
 }
 
 func (h *HomePageServiceImpl) getBlogsForHomePage() ([]model.BlogModel, error) {
@@ -109,16 +116,14 @@ func (h *HomePageServiceImpl) getSlidersForHomePage() ([]model.Slider, error) {
 }
 
 func (h *HomePageServiceImpl) retrieveDataFromCache(
-	blogs []model.BlogModel, sliders []model.Slider, popularProducts []model.PopularProductsModel,
+	blogs []model.BlogModel, sliders []model.Slider,
 ) (model.HomePageModel, error) {
-	popularProductsFromCache, err := h.redis.Get("products")
 	blogsFromCache, err := h.redis.Get("blogs")
 	slidersFromCache, err := h.redis.Get("sliders")
 
 	if err != nil {
 		return model.HomePageModel{}, err
 	}
-	err = json.Unmarshal([]byte(popularProductsFromCache), &popularProducts)
 	err = json.Unmarshal([]byte(blogsFromCache), &blogs)
 	err = json.Unmarshal([]byte(slidersFromCache), &sliders)
 
@@ -127,7 +132,6 @@ func (h *HomePageServiceImpl) retrieveDataFromCache(
 	}
 
 	homePageModel := model.HomePageModel{
-		Products:  popularProducts,
 		BlogModel: blogs,
 		Slider:    sliders,
 	}
