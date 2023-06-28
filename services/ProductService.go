@@ -26,16 +26,7 @@ func (p *ProductServiceImpl) GetProductsByBrand(
 ) (model.Pagination, error) {
 
 	userInformation, err := p.productRepository.GetUsersCompanyGroup(user)
-	if err != nil || userInformation == 0 {
-
-		products, err := p.productRepository.FindPageableProductsByBrandSlug(slug, page, orderBy)
-
-		return products, err
-	}
-
-	products, err := p.productRepository.FindPageableProductsByBrandSlugWithUserPrices(
-		slug, page, orderBy, userInformation,
-	)
+	products, err := p.productRepository.FindPageableProductsByBrandSlug(slug, page, orderBy, userInformation)
 
 	return products, err
 
@@ -53,15 +44,9 @@ func (p *ProductServiceImpl) GetProductsByCategorySlug(
 ) (model.Pagination, error) {
 
 	userInformation, err := p.productRepository.GetUsersCompanyGroup(user)
-	if err != nil || userInformation == 0 {
 
-		products, err := p.productRepository.FindPageableProductsByCategorySlug(slug, page, filterBy, order)
-
-		return products, err
-	}
-
-	products, err := p.productRepository.FindPageableProductsByBrandSlugWithUserPrices(
-		slug, page, filterBy, userInformation,
+	products, err := p.productRepository.FindPageableProductsByCategorySlug(
+		slug, page, filterBy, order, userInformation,
 	)
 
 	return products, err

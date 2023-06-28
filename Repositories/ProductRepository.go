@@ -9,13 +9,14 @@ import (
 )
 
 type ProductRepository interface {
-	FindPageableProductsByBrandSlug(slug string, page int, orderBy string) (model.Pagination, error)
-	FindPageableProductsByBrandSlugWithUserPrices(
-		slug string, page int, orderBy string, groupCompanyId float64,
-	) (model.Pagination, error)
+	FindPageableProductsByBrandSlug(slug string, page int, orderBy string, groupCompanyId float64) (
+		model.Pagination, error,
+	)
 	GetUsersCompanyGroup(user *model.User) (float64, error)
 	FindProductById(id string) (model.Product, error)
-	FindPageableProductsByCategorySlug(slug string, page int, filterBy string, order string) (model.Pagination, error)
+	FindPageableProductsByCategorySlug(
+		slug string, page int, filterBy string, order string, groupCompanyId float64,
+	) (model.Pagination, error)
 }
 
 type ProductRepositoryImpl struct {
@@ -27,20 +28,20 @@ func NewProductRepository(db *gorm.DB) ProductRepository {
 }
 
 func (p *ProductRepositoryImpl) FindPageableProductsByBrandSlug(
-	slug string, page int, orderBy string,
+	slug string, page int, orderBy string, groupCompanyId float64,
 ) (model.Pagination, error) {
+	groupCompanyIdInt := int(groupCompanyId)
 
 	if page < 1 {
 		page = 1
 	}
-	perPage := 12
 
-	// Sayfalama işlemi için offset hesapla
+	perPage := 12
 	offset := (page - 1) * perPage
 
 	var products []model.Product
 
-	err := p.db.Table("products").
+	query := p.db.Table("products").
 		Select(
 			"products.id, products.slug, products.short_desc, products.price, products.special_price, products.qty, products.in_stock,"+
 				" brt.name AS brand_name, pt.name, "+
@@ -53,57 +54,41 @@ func (p *ProductRepositoryImpl) FindPageableProductsByBrandSlug(
 				"INNER JOIN brands br ON br.id = products.brand_id "+
 				"INNER JOIN brand_translations brt ON brt.brand_id = br.id",
 		).
-		Where("products.is_active = true AND br.slug = ?", slug).
+		Where("products.is_active = true AND br.slug = ?", slug)
+
+	if groupCompanyIdInt != 0 {
+		query = query.Select(
+			"products.id, products.slug, products.short_desc, pp.price as price, pp.company_price_id, products.special_price, products.qty, products.in_stock,"+
+				" brt.name AS brand_name, pt.name, "+
+				" f.path AS path, products.is_active, products.created_at, products.updated_at",
+		).
+			Joins(
+				"INNER JOIN product_prices pp ON pp.product_id = products.id AND pp.company_price_id  <= ? AND pp.price != 0",
+				groupCompanyIdInt,
+			)
+
+		perPage = 60
+	}
+
+	err := query.
 		Offset(offset).
 		Limit(perPage).
 		Order(buildOrderByValues(orderBy)).
-		Find(&products).Error
+		Find(&products).
+		Error
+
+	if groupCompanyIdInt != 0 {
+		products = uniqueProductsWithPriceCalculation(products)
+	}
 
 	buildProducts(products)
 
 	pagination := model.Pagination{Data: products}
 
 	return pagination, err
-
 }
 
-func (p *ProductRepositoryImpl) FindPageableProductsByBrandSlugWithUserPrices(
-	slug string, page int, orderBy string, groupCompanyId float64,
-) (model.Pagination, error) {
-
-	groupCompanyIdInt := int(groupCompanyId)
-
-	if page < 1 {
-		page = 1
-	}
-	perPage := 60
-
-	// Sayfalama işlemi için offset hesapla
-	offset := (page - 1) * perPage
-
-	var products []model.Product
-
-	err := p.db.Table("products").
-		Select(
-			"products.id, products.slug, products.short_desc, pp.price as price, pp.company_price_id, products.special_price, products.qty, products.in_stock,"+
-				" brt.name AS brand_name, pt.name, "+
-				" f.path AS path, products.is_active, products.created_at, products.updated_at",
-		).
-		Joins(
-			"INNER JOIN product_translations pt ON pt.product_id = products.id "+
-				"LEFT JOIN entity_files ef ON ef.entity_type = 'Modules\\\\Product\\\\Entities\\\\Product' AND ef.entity_id = products.id and ef.zone = 'base_image' "+
-				"LEFT JOIN files f ON f.id = ef.file_id "+
-				"INNER JOIN brands br ON br.id = products.brand_id "+
-				"INNER JOIN brand_translations brt ON brt.brand_id = br.id "+
-				"INNER JOIN product_prices pp ON pp.product_id = products.id AND pp.company_price_id  <=  ? AND pp.price != 0 ",
-			groupCompanyIdInt,
-		).
-		Where("products.is_active = true AND br.slug = ?", slug).
-		Offset(offset).
-		Limit(perPage).
-		Order(buildOrderByValues(orderBy)).
-		Find(&products).Error
-
+func uniqueProductsWithPriceCalculation(products []model.Product) []model.Product {
 	productMap := make(map[int]model.Product)
 	for _, product := range products {
 		existingProduct, ok := productMap[product.ID]
@@ -118,12 +103,7 @@ func (p *ProductRepositoryImpl) FindPageableProductsByBrandSlugWithUserPrices(
 		uniqueProducts = append(uniqueProducts, product)
 	}
 
-	buildProducts(uniqueProducts)
-
-	pagination := model.Pagination{Data: uniqueProducts}
-
-	return pagination, err
-
+	return uniqueProducts
 }
 
 func (p *ProductRepositoryImpl) GetUsersCompanyGroup(user *model.User) (float64, error) {
@@ -181,8 +161,10 @@ func buildOrderByValues(orderBy string) string {
 }
 
 func (p *ProductRepositoryImpl) FindPageableProductsByCategorySlug(
-	slug string, page int, filterBy string, order string,
+	slug string, page int, filterBy string, order string, groupCompanyId float64,
 ) (model.Pagination, error) {
+
+	groupCompanyIdInt := int(groupCompanyId)
 
 	var id int
 	err := p.db.Select("id").Table("categories").Where("slug = ?", slug).Scan(&id).Error
@@ -227,11 +209,29 @@ func (p *ProductRepositoryImpl) FindPageableProductsByCategorySlug(
 		)
 	}
 
+	if groupCompanyIdInt != 0 {
+		query = query.Select(
+			"products.id, products.slug, products.short_desc, pp.price as price, pp.company_price_id, products.special_price, products.qty, products.in_stock,"+
+				" brt.name AS brand_name, pt.name, "+
+				" f.path AS path, products.is_active, products.created_at, products.updated_at",
+		).
+			Joins(
+				"INNER JOIN product_prices pp ON pp.product_id = products.id AND pp.company_price_id  <= ? AND pp.price != 0",
+				groupCompanyIdInt,
+			)
+
+		perPage = 60
+	}
+
 	err = query.
 		Offset(offset).
 		Limit(perPage).
 		Order(buildOrderByValues(order)).
 		Find(&products).Error
+
+	if groupCompanyId != 0 {
+		products = uniqueProductsWithPriceCalculation(products)
+	}
 
 	buildProducts(products)
 
