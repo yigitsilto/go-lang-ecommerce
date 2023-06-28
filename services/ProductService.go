@@ -8,6 +8,9 @@ import (
 type ProductService interface {
 	GetProductsByBrand(slug string, page int, orderBy string, user *model.User) (model.Pagination, error)
 	FindProductById(id string) (model.Product, error)
+	GetProductsByCategorySlug(slug string, page int, filterBy string, order string, user *model.User) (
+		model.Pagination, error,
+	)
 }
 
 type ProductServiceImpl struct {
@@ -43,4 +46,24 @@ func (p *ProductServiceImpl) FindProductById(id string) (model.Product, error) {
 	product, err := p.productRepository.FindProductById(id)
 
 	return product, err
+}
+
+func (p *ProductServiceImpl) GetProductsByCategorySlug(
+	slug string, page int, filterBy string, order string, user *model.User,
+) (model.Pagination, error) {
+
+	userInformation, err := p.productRepository.GetUsersCompanyGroup(user)
+	if err != nil || userInformation == 0 {
+
+		products, err := p.productRepository.FindPageableProductsByCategorySlug(slug, page, filterBy, order)
+
+		return products, err
+	}
+
+	products, err := p.productRepository.FindPageableProductsByBrandSlugWithUserPrices(
+		slug, page, filterBy, userInformation,
+	)
+
+	return products, err
+
 }

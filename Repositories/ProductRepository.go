@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"gorm.io/gorm"
 	"os"
+	"strings"
 )
 
 type ProductRepository interface {
@@ -14,6 +15,7 @@ type ProductRepository interface {
 	) (model.Pagination, error)
 	GetUsersCompanyGroup(user *model.User) (float64, error)
 	FindProductById(id string) (model.Product, error)
+	FindPageableProductsByCategorySlug(slug string, page int, filterBy string, order string) (model.Pagination, error)
 }
 
 type ProductRepositoryImpl struct {
@@ -176,4 +178,65 @@ func buildOrderByValues(orderBy string) string {
 	default:
 		return " products.created_at"
 	}
+}
+
+func (p *ProductRepositoryImpl) FindPageableProductsByCategorySlug(
+	slug string, page int, filterBy string, order string,
+) (model.Pagination, error) {
+
+	var id int
+	err := p.db.Select("id").Table("categories").Where("slug = ?", slug).Scan(&id).Error
+
+	if err != nil {
+		return model.Pagination{}, err
+	}
+
+	if page < 1 {
+		page = 1
+	}
+	perPage := 12
+
+	// Sayfalama işlemi için offset hesapla
+	offset := (page - 1) * perPage
+
+	var products []model.Product
+
+	query := p.db.Table("products").
+		Select(
+			"distinct products.id, products.slug, products.short_desc, products.price, products.special_price, products.qty, products.in_stock,"+
+				" brt.name AS brand_name, pt.name, "+
+				" f.path AS path, products.is_active, products.created_at, products.updated_at",
+		).
+		Joins(
+			"INNER JOIN product_translations pt ON pt.product_id = products.id "+
+				"LEFT JOIN entity_files ef ON ef.entity_type = 'Modules\\\\Product\\\\Entities\\\\Product' AND ef.entity_id = products.id and ef.zone = 'base_image' "+
+				"LEFT JOIN files f ON f.id = ef.file_id "+
+				"INNER JOIN brands br ON br.id = products.brand_id "+
+				"INNER JOIN brand_translations brt ON brt.brand_id = br.id",
+		).
+		Where(
+			"products.is_active = true AND EXISTS (SELECT 1 FROM product_categories AS pc WHERE pc.category_id = ? AND pc.product_id = products.id)",
+			id,
+		)
+
+	if filterBy != "" {
+		filterArray := strings.Split(filterBy, ",")
+		query = query.Where(
+			"EXISTS (SELECT 1 FROM product_filter_values AS pfv WHERE pfv.product_id = products.id AND pfv.filter_value_id IN (?))",
+			filterArray,
+		)
+	}
+
+	err = query.
+		Offset(offset).
+		Limit(perPage).
+		Order(buildOrderByValues(order)).
+		Find(&products).Error
+
+	buildProducts(products)
+
+	pagination := model.Pagination{Data: products}
+
+	return pagination, err
+
 }
