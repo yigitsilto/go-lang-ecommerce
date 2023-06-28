@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"gorm.io/gorm"
 	"os"
+	"sort"
 	"strings"
 )
 
@@ -43,7 +44,7 @@ func (p *ProductRepositoryImpl) FindPageableProductsByBrandSlug(
 
 	query := p.db.Table("products").
 		Select(
-			"products.id, products.slug, products.short_desc, products.price, products.special_price, products.qty, products.in_stock,"+
+			"products.id, products.slug, products.short_desc, products.price as price, products.special_price, products.qty, products.in_stock,"+
 				" brt.name AS brand_name, pt.name, "+
 				" f.path AS path, products.is_active, products.created_at, products.updated_at",
 		).
@@ -79,7 +80,7 @@ func (p *ProductRepositoryImpl) FindPageableProductsByBrandSlug(
 		Error
 
 	if groupCompanyIdInt != 0 {
-		products = uniqueProductsWithPriceCalculation(products)
+		products = uniqueProductsWithPriceCalculation(products, orderBy)
 	}
 
 	buildProducts(products)
@@ -89,8 +90,26 @@ func (p *ProductRepositoryImpl) FindPageableProductsByBrandSlug(
 	return pagination, err
 }
 
-func uniqueProductsWithPriceCalculation(products []model.Product) []model.Product {
+func uniqueProductsWithPriceCalculation(products []model.Product, orderBy string) []model.Product {
 	productMap := make(map[int]model.Product)
+	var uniqueProducts []model.Product
+
+	// Sıralama işlevlerini depolamak için bir map oluştur
+	sortFuncMap := map[string]func(i, j int) bool{
+		"orderByNameAsc": func(i, j int) bool {
+			return uniqueProducts[i].Name < uniqueProducts[j].Name
+		},
+		"orderByNameDesc": func(i, j int) bool {
+			return uniqueProducts[i].Name > uniqueProducts[j].Name
+		},
+		"orderByPriceAsc": func(i, j int) bool {
+			return uniqueProducts[i].Price < uniqueProducts[j].Price
+		},
+		"orderByPriceDesc": func(i, j int) bool {
+			return uniqueProducts[i].Price > uniqueProducts[j].Price
+		},
+	}
+
 	for _, product := range products {
 		existingProduct, ok := productMap[product.ID]
 		if !ok || product.CompanyPriceId > existingProduct.CompanyPriceId {
@@ -98,10 +117,13 @@ func uniqueProductsWithPriceCalculation(products []model.Product) []model.Produc
 		}
 	}
 
-	// Sonuçları al
-	var uniqueProducts []model.Product
 	for _, product := range productMap {
 		uniqueProducts = append(uniqueProducts, product)
+	}
+
+	// Sıralama fonksiyonunu uygula
+	if sortFunc, ok := sortFuncMap[orderBy]; ok {
+		sort.SliceStable(uniqueProducts, sortFunc)
 	}
 
 	return uniqueProducts
@@ -149,9 +171,9 @@ func buildProducts(products []model.Product) {
 func buildOrderByValues(orderBy string) string {
 	switch orderBy {
 	case "orderByPriceAsc":
-		return "products.price asc"
+		return " price asc"
 	case "orderByPriceDesc":
-		return " products.price desc"
+		return " price desc"
 	case "orderByNameAsc":
 		return "pt.name asc"
 	case "orderByNameDesc":
@@ -186,7 +208,7 @@ func (p *ProductRepositoryImpl) FindPageableProductsByCategorySlug(
 
 	query := p.db.Table("products").
 		Select(
-			"distinct products.id, products.slug, products.short_desc, products.price, products.special_price, products.qty, products.in_stock,"+
+			"distinct products.id, products.slug, products.short_desc, products.price as price, products.special_price, products.qty, products.in_stock,"+
 				" brt.name AS brand_name, pt.name, "+
 				" f.path AS path, products.is_active, products.created_at, products.updated_at",
 		).
@@ -232,7 +254,7 @@ func (p *ProductRepositoryImpl) FindPageableProductsByCategorySlug(
 		Find(&products).Error
 
 	if groupCompanyId != 0 {
-		products = uniqueProductsWithPriceCalculation(products)
+		products = uniqueProductsWithPriceCalculation(products, order)
 	}
 
 	buildProducts(products)
