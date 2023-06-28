@@ -68,6 +68,7 @@ func (p *ProductRepositoryImpl) FindPageableProductsByBrandSlug(
 			)
 
 		perPage = 60
+		offset = (page - 1) * perPage
 	}
 
 	err := query.
@@ -221,6 +222,7 @@ func (p *ProductRepositoryImpl) FindPageableProductsByCategorySlug(
 			)
 
 		perPage = 60
+		offset = (page - 1) * perPage
 	}
 
 	err = query.
