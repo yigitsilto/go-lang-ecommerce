@@ -43,14 +43,14 @@ func (h *HomePageServiceImpl) GetHomePage(user *dto.User) (dto.HomePageModel, er
 	var blogs []dto.BlogModel
 	var sliders []dto.Slider
 
-	homePageFromCache, err := h.retrieveDataFromCache(blogs, sliders)
-
 	userInformation, err := h.productRepository.GetUsersCompanyGroup(user)
 	if err != nil || userInformation == 0 {
 		popularProducts, _ = h.popularProductRepository.GetAllRelatedProducts()
 	} else {
 		popularProducts, _ = h.popularProductRepository.GetAllRelatedProductsWithUserSpecialPrices(userInformation)
 	}
+
+	homePageFromCache, err := h.retrieveDataFromCache(blogs, sliders)
 
 	if err == nil {
 		return dto.HomePageModel{
