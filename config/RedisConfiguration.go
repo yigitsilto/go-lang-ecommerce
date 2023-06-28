@@ -15,7 +15,7 @@ func NewRedisClient() *RedisClient {
 		&redis.Options{
 			Addr:     os.Getenv("REDIS_ADDR"),
 			Password: os.Getenv("REDIS_PASSWORD"),
-			DB:       1,
+			DB:       0,
 		},
 	)
 
