@@ -3,7 +3,6 @@ package services
 import (
 	"ecommerce/Repositories"
 	"ecommerce/dto"
-	"ecommerce/entities"
 )
 
 type ProductService interface {
@@ -12,7 +11,7 @@ type ProductService interface {
 	GetProductsByCategorySlug(slug string, page int, filterBy string, order string, user *dto.User) (
 		dto.Pagination, error,
 	)
-	FindFiltersForProduct() ([]entities.Filters, error)
+	FindFiltersForProduct() ([]dto.FilterModel, error)
 }
 
 type ProductServiceImpl struct {
@@ -41,7 +40,7 @@ func (p *ProductServiceImpl) FindProductById(id string) (dto.Product, error) {
 	return product, err
 }
 
-func (p *ProductServiceImpl) FindFiltersForProduct() ([]entities.Filters, error) {
+func (p *ProductServiceImpl) FindFiltersForProduct() ([]dto.FilterModel, error) {
 
 	filters, err := p.productRepository.GetFiltersForProduct()
 

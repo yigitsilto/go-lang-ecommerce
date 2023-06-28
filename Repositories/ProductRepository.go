@@ -19,7 +19,7 @@ type ProductRepository interface {
 	FindPageableProductsByCategorySlug(
 		slug string, page int, filterBy string, order string, groupCompanyId float64,
 	) (dto.Pagination, error)
-	GetFiltersForProduct() ([]entities.Filters, error)
+	GetFiltersForProduct() ([]dto.FilterModel, error)
 }
 
 type ProductRepositoryImpl struct {
@@ -30,13 +30,37 @@ func NewProductRepository(db *gorm.DB) ProductRepository {
 	return &ProductRepositoryImpl{db: db}
 }
 
-func (p *ProductRepositoryImpl) GetFiltersForProduct() ([]entities.Filters, error) {
+func (p *ProductRepositoryImpl) GetFiltersForProduct() ([]dto.FilterModel, error) {
 	var filters []entities.Filters
 
 	err := p.db.Table("filters").Preload("Values").Where("status =?", true).Find(&filters).Error
 
-	return filters, err
+	return convertToFilterModel(filters), err
 
+}
+func convertToFilterModel(filters []entities.Filters) []dto.FilterModel {
+	var filterListModel []dto.FilterModel
+
+	for _, filter := range filters {
+		filterModel := dto.FilterModel{
+			Id:    filter.ID,
+			Slug:  filter.Slug,
+			Title: filter.Title,
+		}
+
+		for _, value := range filter.Values {
+			filterValueModel := dto.FilterValuesModel{
+				Id:    value.Id,
+				Slug:  value.Slug,
+				Title: value.Title,
+			}
+			filterModel.Values = append(filterModel.Values, filterValueModel)
+		}
+		filterListModel = append(filterListModel, filterModel)
+
+	}
+
+	return filterListModel
 }
 
 func (p *ProductRepositoryImpl) FindPageableProductsByBrandSlug(
