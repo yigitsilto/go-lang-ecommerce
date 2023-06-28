@@ -2,6 +2,7 @@ package Repositories
 
 import (
 	"ecommerce/dto"
+	"ecommerce/entities"
 	"fmt"
 	"gorm.io/gorm"
 	"os"
@@ -18,7 +19,7 @@ type ProductRepository interface {
 	FindPageableProductsByCategorySlug(
 		slug string, page int, filterBy string, order string, groupCompanyId float64,
 	) (dto.Pagination, error)
-	GetFiltersForProduct()
+	GetFiltersForProduct() ([]entities.Filters, error)
 }
 
 type ProductRepositoryImpl struct {
@@ -29,9 +30,13 @@ func NewProductRepository(db *gorm.DB) ProductRepository {
 	return &ProductRepositoryImpl{db: db}
 }
 
-func (p *ProductRepositoryImpl) GetFiltersForProduct() {
-	//TODO implement me
-	panic("implement me")
+func (p *ProductRepositoryImpl) GetFiltersForProduct() ([]entities.Filters, error) {
+	var filters []entities.Filters
+
+	err := p.db.Table("filters").Preload("Values").Where("status =?", true).Find(&filters).Error
+
+	return filters, err
+
 }
 
 func (p *ProductRepositoryImpl) FindPageableProductsByBrandSlug(

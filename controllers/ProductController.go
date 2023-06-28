@@ -78,3 +78,15 @@ func (p *ProductController) FindByCategorySlug(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{"data": products})
 }
+
+func (p *ProductController) FindFiltersForProducts(c *gin.Context) {
+
+	filters, err := p.productService.FindFiltersForProduct()
+
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"data": exceptions.ServerError.Error()})
+		return
+
+	}
+	c.JSON(http.StatusOK, gin.H{"data": filters})
+}
