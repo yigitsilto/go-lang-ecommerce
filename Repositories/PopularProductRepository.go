@@ -2,28 +2,28 @@ package Repositories
 
 import (
 	model "ecommerce/dto"
-	"fmt"
+	"ecommerce/utils"
 	"gorm.io/gorm"
-	"os"
 )
 
 type PopularProductRepository interface {
-	GetAllRelatedProducts(companyGroupId float64) ([]model.PopularProductsModel, error)
+	GetAllRelatedProducts(companyGroupId float64) ([]model.Product, error)
 }
 
 type PopularProductRepositoryImpl struct {
-	db *gorm.DB
+	db          *gorm.DB
+	productUtil utils.ProductUtilInterface
 }
 
-func NewPopularProductRepository(db *gorm.DB) PopularProductRepository {
-	return &PopularProductRepositoryImpl{db: db}
+func NewPopularProductRepository(db *gorm.DB, productUtil utils.ProductUtilInterface) PopularProductRepository {
+	return &PopularProductRepositoryImpl{db: db, productUtil: productUtil}
 }
 
 func (pp *PopularProductRepositoryImpl) GetAllRelatedProducts(companyGroupId float64) (
-	[]model.PopularProductsModel, error,
+	[]model.Product, error,
 ) {
 
-	popularProducts := []model.PopularProductsModel{}
+	popularProducts := []model.Product{}
 
 	groupCompanyIdInt := int(companyGroupId)
 
@@ -61,40 +61,12 @@ func (pp *PopularProductRepositoryImpl) GetAllRelatedProducts(companyGroupId flo
 
 	if groupCompanyIdInt != 0 {
 
-		popularProducts = uniquePopularProductsWithPriceCalculation(popularProducts)
+		popularProducts = pp.productUtil.UniqueProductsWithPriceCalculation(popularProducts, "orderByIdAsc")
 
 	}
 
-	buildPopularProducts(popularProducts)
+	pp.productUtil.BuildProducts(popularProducts)
 
 	return popularProducts, err
 
-}
-
-func uniquePopularProductsWithPriceCalculation(
-	products []model.PopularProductsModel,
-) []model.PopularProductsModel {
-	productMap := make(map[int]model.PopularProductsModel)
-	var uniqueProducts []model.PopularProductsModel
-
-	for _, product := range products {
-		existingProduct, ok := productMap[product.ID]
-		if !ok || product.CompanyPriceId > existingProduct.CompanyPriceId {
-			productMap[product.ID] = product
-		}
-	}
-
-	for _, product := range productMap {
-		uniqueProducts = append(uniqueProducts, product)
-	}
-
-	return uniqueProducts
-}
-
-func buildPopularProducts(popularProducts []model.PopularProductsModel) {
-	for index, product := range popularProducts {
-		popularProducts[index].PriceFormatted = fmt.Sprintf("%.2f TRY", product.Price)
-		popularProducts[index].SpecialPriceFormatted = fmt.Sprintf("%.2f TRY", product.SpecialPrice)
-		popularProducts[index].Path = os.Getenv("IMAGE_APP_URL") + product.Path
-	}
 }

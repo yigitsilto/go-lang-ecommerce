@@ -3,10 +3,8 @@ package Repositories
 import (
 	"ecommerce/dto"
 	"ecommerce/entities"
-	"fmt"
+	"ecommerce/utils"
 	"gorm.io/gorm"
-	"os"
-	"sort"
 	"strings"
 )
 
@@ -23,11 +21,12 @@ type ProductRepository interface {
 }
 
 type ProductRepositoryImpl struct {
-	db *gorm.DB
+	db          *gorm.DB
+	productUtil utils.ProductUtilInterface
 }
 
-func NewProductRepository(db *gorm.DB) ProductRepository {
-	return &ProductRepositoryImpl{db: db}
+func NewProductRepository(db *gorm.DB, productUtil utils.ProductUtilInterface) ProductRepository {
+	return &ProductRepositoryImpl{db: db, productUtil: productUtil}
 }
 
 func (p *ProductRepositoryImpl) GetFiltersForProduct() ([]dto.FilterModel, error) {
@@ -110,58 +109,19 @@ func (p *ProductRepositoryImpl) FindPageableProductsByBrandSlug(
 	err := query.
 		Offset(offset).
 		Limit(perPage).
-		Order(buildOrderByValues(orderBy)).
+		Order(p.productUtil.BuildOrderByValues(&orderBy)).
 		Find(&products).
 		Error
 
 	if groupCompanyIdInt != 0 {
-		products = uniqueProductsWithPriceCalculation(products, orderBy)
+		products = p.productUtil.UniqueProductsWithPriceCalculation(products, orderBy)
 	}
 
-	buildProducts(products)
+	p.productUtil.BuildProducts(products)
 
 	pagination := dto.Pagination{Data: products}
 
 	return pagination, err
-}
-
-func uniqueProductsWithPriceCalculation(products []dto.Product, orderBy string) []dto.Product {
-	productMap := make(map[int]dto.Product)
-	var uniqueProducts []dto.Product
-
-	// Sıralama işlevlerini depolamak için bir map oluştur
-	sortFuncMap := map[string]func(i, j int) bool{
-		"orderByNameAsc": func(i, j int) bool {
-			return uniqueProducts[i].Name < uniqueProducts[j].Name
-		},
-		"orderByNameDesc": func(i, j int) bool {
-			return uniqueProducts[i].Name > uniqueProducts[j].Name
-		},
-		"orderByPriceAsc": func(i, j int) bool {
-			return uniqueProducts[i].Price < uniqueProducts[j].Price
-		},
-		"orderByPriceDesc": func(i, j int) bool {
-			return uniqueProducts[i].Price > uniqueProducts[j].Price
-		},
-	}
-
-	for _, product := range products {
-		existingProduct, ok := productMap[product.ID]
-		if !ok || product.CompanyPriceId > existingProduct.CompanyPriceId {
-			productMap[product.ID] = product
-		}
-	}
-
-	for _, product := range productMap {
-		uniqueProducts = append(uniqueProducts, product)
-	}
-
-	// Sıralama fonksiyonunu uygula
-	if sortFunc, ok := sortFuncMap[orderBy]; ok {
-		sort.SliceStable(uniqueProducts, sortFunc)
-	}
-
-	return uniqueProducts
 }
 
 func (p *ProductRepositoryImpl) GetUsersCompanyGroup(user *dto.User) (float64, error) {
@@ -189,33 +149,10 @@ func (p *ProductRepositoryImpl) FindProductBySlug(slug string) (dto.Product, err
 		" INNER JOIN product_translations pt on pt.product_id = products.id "+
 			"INNER JOIN entity_files ef on ef.entity_type = 'Modules\\\\Product\\\\Entities\\\\Product' and ef.entity_id = products.id"+
 			" INNER JOIN files f on f.id = ef.file_id",
-	).Where("products.slug=?", slug).Find(&product).Error
+	).Where("products.slug =?", slug).Find(&product).Error
 
 	return product, err
 
-}
-
-func buildProducts(products []dto.Product) {
-	for index, product := range products {
-		products[index].PriceFormatted = fmt.Sprintf("%.2f TRY", product.Price)
-		products[index].SpecialPriceFormatted = fmt.Sprintf("%.2f TRY", product.SpecialPrice)
-		products[index].Path = os.Getenv("IMAGE_APP_URL") + product.Path
-	}
-}
-
-func buildOrderByValues(orderBy string) string {
-	switch orderBy {
-	case "orderByPriceAsc":
-		return " price asc"
-	case "orderByPriceDesc":
-		return " price desc"
-	case "orderByNameAsc":
-		return "pt.name asc"
-	case "orderByNameDesc":
-		return " pt.name desc"
-	default:
-		return " products.created_at"
-	}
 }
 
 func (p *ProductRepositoryImpl) FindPageableProductsByCategorySlug(
@@ -285,14 +222,14 @@ func (p *ProductRepositoryImpl) FindPageableProductsByCategorySlug(
 	err = query.
 		Offset(offset).
 		Limit(perPage).
-		Order(buildOrderByValues(order)).
+		Order(p.productUtil.BuildOrderByValues(&order)).
 		Find(&products).Error
 
 	if groupCompanyId != 0 {
-		products = uniqueProductsWithPriceCalculation(products, order)
+		products = p.productUtil.UniqueProductsWithPriceCalculation(products, order)
 	}
 
-	buildProducts(products)
+	p.productUtil.BuildProducts(products)
 
 	pagination := dto.Pagination{Data: products}
 

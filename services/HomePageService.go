@@ -39,7 +39,7 @@ func NewHomePageService(
 
 func (h *HomePageServiceImpl) GetHomePage(user *dto.User) (dto.HomePageModel, error) {
 
-	var popularProducts []dto.PopularProductsModel
+	var popularProducts []dto.Product
 	var blogs []dto.BlogModel
 	var sliders []dto.Slider
 

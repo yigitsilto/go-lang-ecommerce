@@ -6,12 +6,14 @@ import (
 	"ecommerce/controllers"
 	"ecommerce/database"
 	"ecommerce/services"
+	"ecommerce/utils"
 	"github.com/gin-gonic/gin"
 )
 
 func RegisterRoutes(router *gin.Engine) {
 	db := database.Database
 	redisClient := config.NewRedisClient()
+	productUtil := utils.ProductUtilImpl{}
 
 	// dependency injections for brands
 	brandRepository := Repositories.NewBrandRepository(db)
@@ -21,8 +23,8 @@ func RegisterRoutes(router *gin.Engine) {
 	// dependency injections for homePage
 	blogRepository := Repositories.NewBlogRepository(db)
 	sliderRepository := Repositories.NewSliderRepository(db)
-	productRepository := Repositories.NewProductRepository(db)
-	popularProductsRepository := Repositories.NewPopularProductRepository(db)
+	productRepository := Repositories.NewProductRepository(db, &productUtil)
+	popularProductsRepository := Repositories.NewPopularProductRepository(db, &productUtil)
 	homePageService := services.NewHomePageService(
 		sliderRepository, popularProductsRepository, productRepository, blogRepository, redisClient,
 	)
