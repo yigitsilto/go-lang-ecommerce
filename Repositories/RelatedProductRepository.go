@@ -53,7 +53,7 @@ func (r *RelatedProductRepositoryImpl) FindAllRelatedProducts(groupCompanyId flo
 		query = query.Select(
 			"products.id, products.slug, products.short_desc as short_description, pp.price as price, pp.company_price_id, products.special_price, products.qty, products.in_stock,"+
 				" brt.name AS brand_name, pt.name, "+
-				" f.path AS path, products.is_active, related_products.created_at, related_products.updated_at",
+				" f.path AS path, products.is_active, products.created_at, products.updated_at",
 		).
 			Joins(
 				"INNER JOIN product_prices pp ON pp.product_id = products.id AND pp.company_price_id  <=  ? AND pp.price != 0 ",
@@ -102,7 +102,7 @@ func (r *RelatedProductRepositoryImpl) FindDummyRelatedProducts(groupCompanyId f
 		query = query.Select(
 			"products.id, products.slug, products.short_desc as short_description, pp.price as price, pp.company_price_id, products.special_price, products.qty, products.in_stock,"+
 				" brt.name AS brand_name, pt.name, "+
-				" f.path AS path, products.is_active, related_products.created_at, related_products.updated_at",
+				" f.path AS path, products.is_active, products.created_at, products.updated_at",
 		).
 			Joins(
 				"INNER JOIN product_prices pp ON pp.product_id = products.id AND pp.company_price_id  <=  ? AND pp.price != 0 ",
