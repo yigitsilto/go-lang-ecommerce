@@ -39,6 +39,11 @@ func RegisterRoutes(router *gin.Engine) {
 	relatedProductService := services.NewRelatedProductService(relatedProductRepository, productRepository)
 	relatedProductController := controllers.NewRelatedProductController(relatedProductService)
 
+	// settings dependency injections
+	settingsRepository := Repositories.NewSettingsRepository(db)
+	settingsService := services.NewSettingsService(settingsRepository)
+	settingsController := controllers.NewSettingController(settingsService)
+
 	// Register the routers for brands.
 	router.GET("/api/brands", brandController.GetAllBrands)
 	router.GET("/api/brands/:id", brandController.FindById)
@@ -54,5 +59,8 @@ func RegisterRoutes(router *gin.Engine) {
 
 	// related products
 	router.GET("/api/relatedProducts", relatedProductController.FindAllRelatedProducts)
+
+	// settings
+	router.GET("/api/settings", settingsController.GetSettings)
 
 }

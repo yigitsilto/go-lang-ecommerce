@@ -7,7 +7,7 @@ import (
 
 type ProductService interface {
 	GetProductsByBrand(slug string, page int, orderBy string, user *dto.User) (dto.Pagination, error)
-	FindProductBySlug(slug string) (dto.Product, error)
+	FindProductBySlug(slug string, user *dto.User) (dto.Product, error)
 	GetProductsByCategorySlug(slug string, page int, filterBy string, order string, user *dto.User) (
 		dto.Pagination, error,
 	)
@@ -33,9 +33,10 @@ func (p *ProductServiceImpl) GetProductsByBrand(
 
 }
 
-func (p *ProductServiceImpl) FindProductBySlug(slug string) (dto.Product, error) {
+func (p *ProductServiceImpl) FindProductBySlug(slug string, user *dto.User) (dto.Product, error) {
 
-	product, err := p.productRepository.FindProductBySlug(slug)
+	userInformation, err := p.productRepository.GetUsersCompanyGroup(user)
+	product, err := p.productRepository.FindProductBySlug(slug, userInformation)
 
 	return product, err
 }

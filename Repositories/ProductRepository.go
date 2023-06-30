@@ -13,7 +13,7 @@ type ProductRepository interface {
 		dto.Pagination, error,
 	)
 	GetUsersCompanyGroup(user *dto.User) (float64, error)
-	FindProductBySlug(id string) (dto.Product, error)
+	FindProductBySlug(slug string, groupCompanyId float64) (dto.Product, error)
 	FindPageableProductsByCategorySlug(
 		slug string, page int, filterBy string, order string, groupCompanyId float64,
 	) (dto.Pagination, error)
@@ -141,17 +141,51 @@ func (p *ProductRepositoryImpl) GetUsersCompanyGroup(user *dto.User) (float64, e
 
 }
 
-func (p *ProductRepositoryImpl) FindProductBySlug(slug string) (dto.Product, error) {
+func (p *ProductRepositoryImpl) FindProductBySlug(slug string, groupCompanyId float64) (dto.Product, error) {
 
-	product := dto.Product{}
+	groupCompanyIdInt := int(groupCompanyId)
 
-	err := p.db.Table("products").Select("*").Joins(
-		" INNER JOIN product_translations pt on pt.product_id = products.id "+
-			"INNER JOIN entity_files ef on ef.entity_type = 'Modules\\\\Product\\\\Entities\\\\Product' and ef.entity_id = products.id"+
-			" INNER JOIN files f on f.id = ef.file_id",
-	).Where("products.slug =?", slug).Find(&product).Error
+	var products []dto.Product
 
-	return product, err
+	query := p.db.Table("products").
+		Select(
+			"products.id, products.slug, products.short_desc, products.price as price, products.special_price, products.qty, products.in_stock,"+
+				" brt.name AS brand_name, pt.name, "+
+				" f.path AS path, products.is_active, products.created_at, products.updated_at",
+		).
+		Joins(
+			"INNER JOIN product_translations pt ON pt.product_id = products.id "+
+				"LEFT JOIN entity_files ef ON ef.entity_type = 'Modules\\\\Product\\\\Entities\\\\Product' AND ef.entity_id = products.id and ef.zone = 'base_image' "+
+				"LEFT JOIN files f ON f.id = ef.file_id "+
+				"LEFT JOIN brands br ON br.id = products.brand_id "+
+				"LEFT JOIN brand_translations brt ON brt.brand_id = br.id",
+		).
+		Where("products.is_active = true AND products.slug = ?", slug)
+
+	if groupCompanyIdInt != 0 {
+		query = query.Select(
+			"products.id, products.slug, products.short_desc, pp.price as price, pp.company_price_id, products.special_price, products.qty, products.in_stock,"+
+				" brt.name AS brand_name, pt.name, "+
+				" f.path AS path, products.is_active, products.created_at, products.updated_at",
+		).
+			Joins(
+				"INNER JOIN product_prices pp ON pp.product_id = products.id AND pp.company_price_id  <= ? AND pp.price != 0",
+				groupCompanyIdInt,
+			)
+
+	}
+
+	err := query.
+		Find(&products).
+		Error
+
+	if groupCompanyIdInt != 0 {
+		products = p.productUtil.UniqueProductsWithPriceCalculation(products, "")
+	}
+
+	p.productUtil.BuildProducts(products)
+
+	return products[0], err
 
 }
 

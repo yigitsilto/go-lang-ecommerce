@@ -43,7 +43,13 @@ func (p *ProductController) GetProductsByBrand(c *gin.Context) {
 
 func (p *ProductController) FindProductBySlug(c *gin.Context) {
 
-	product, err := p.productService.FindProductBySlug(c.Param("id"))
+	user, _ := c.Get("user")
+	authUser := model.User{}
+	if user != nil {
+		authUser = user.(model.User)
+	}
+
+	product, err := p.productService.FindProductBySlug(c.Param("slug"), &authUser)
 
 	if err != nil || product.Slug == "" {
 		c.JSON(http.StatusNotFound, gin.H{"data": exceptions.EntityNotFoundException.Error()})
