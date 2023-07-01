@@ -19,7 +19,7 @@ type MenuModel struct {
 	Name     string         `json:"name"`
 	IsRoot   string         `json:"is_root"`
 	ParentId uint           `json:"parentId"`
-	Child    []SubMenuModel `json:"child,omitempty" gorm:"-"`
+	Items    []SubMenuModel `json:"items" gorm:"-"`
 }
 
 type SubMenuModel struct {

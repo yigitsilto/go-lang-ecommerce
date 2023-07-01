@@ -55,6 +55,8 @@ func (s *SettingsRepositoryImpl) GetSettings() (dto.GeneralSettingsModel, error)
 	for _, item := range settingsModel {
 		settingsMap[item.Key] = item.Value
 	}
+	settingsMap["storefront_secondary_color"] = settingsMap["storefront_mail_theme_color"]
+	settingsMap["storefront_primary_color"] = settingsMap["storefront_custom_theme_color"]
 
 	menus, err := s.getMenus(settingsMap)
 	footer1, err := s.getFooter1(settingsMap)
@@ -73,7 +75,7 @@ func (s *SettingsRepositoryImpl) getMenus(settingsMap map[string]string) ([]dto.
 	var menus []dto.MenuModel
 
 	err := s.db.Table("menus").
-		Select("mt.name, mi.parent_id, mi.is_root, mi.url, mi.type, mi.parent_id, mi.id  ").
+		Select("mt.name, mi.parent_id, mi.is_root, mi.url, mi.type, mi.parent_id, mi.id ").
 		Joins(
 			"INNER JOIN menu_items mi ON mi.menu_id = menus.id AND mi.is_active =? "+
 				"INNER JOIN menu_item_translations mt ON mt.menu_item_id = mi.id ", true,
