@@ -40,40 +40,27 @@ func (pu *ProductUtilImpl) BuildOrderByValues(orderBy *string) string {
 }
 
 func (pu *ProductUtilImpl) UniqueProductsWithPriceCalculation(products []dto.Product, orderBy string) []dto.Product {
-	productMap := make(map[int]dto.Product)
-	var uniqueProducts []dto.Product
 
 	// Sıralama işlevlerini depolamak için bir map oluştur
 	sortFuncMap := map[string]func(i, j int) bool{
 		"orderByNameAsc": func(i, j int) bool {
-			return uniqueProducts[i].Name < uniqueProducts[j].Name
+			return products[i].Name < products[j].Name
 		},
 		"orderByNameDesc": func(i, j int) bool {
-			return uniqueProducts[i].Name > uniqueProducts[j].Name
+			return products[i].Name > products[j].Name
 		},
 		"orderByPriceAsc": func(i, j int) bool {
-			return uniqueProducts[i].Price < uniqueProducts[j].Price
+			return products[i].Price < products[j].Price
 		},
 		"orderByPriceDesc": func(i, j int) bool {
-			return uniqueProducts[i].Price > uniqueProducts[j].Price
+			return products[i].Price > products[j].Price
 		},
-	}
-
-	for _, product := range products {
-		existingProduct, ok := productMap[product.ID]
-		if !ok || product.CompanyPriceId > existingProduct.CompanyPriceId {
-			productMap[product.ID] = product
-		}
-	}
-
-	for _, product := range productMap {
-		uniqueProducts = append(uniqueProducts, product)
 	}
 
 	// Sıralama fonksiyonunu uygula
 	if sortFunc, ok := sortFuncMap[orderBy]; ok {
-		sort.SliceStable(uniqueProducts, sortFunc)
+		sort.SliceStable(products, sortFunc)
 	}
 
-	return uniqueProducts
+	return products
 }
