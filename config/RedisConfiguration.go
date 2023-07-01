@@ -32,7 +32,7 @@ func (r *RedisClient) Get(key string) (string, error) {
 }
 
 func (r *RedisClient) Set(key string, value string) error {
-	err := r.client.Set(key, value, 5*time.Minute).Err()
+	err := r.client.Set(key, value, 60*time.Minute).Err()
 	if err != nil {
 		return err
 	}

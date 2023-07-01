@@ -41,7 +41,7 @@ func RegisterRoutes(router *gin.Engine) {
 
 	// settings dependency injections
 	settingsRepository := Repositories.NewSettingsRepository(db)
-	settingsService := services.NewSettingsService(settingsRepository)
+	settingsService := services.NewSettingsService(settingsRepository, redisClient)
 	settingsController := controllers.NewSettingController(settingsService)
 
 	// Register the routers for brands.

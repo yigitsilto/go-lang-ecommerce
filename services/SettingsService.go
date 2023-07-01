@@ -2,7 +2,9 @@ package services
 
 import (
 	"ecommerce/Repositories"
+	"ecommerce/config"
 	"ecommerce/dto"
+	"encoding/json"
 )
 
 type SettingsServiceInterface interface {
@@ -10,15 +12,29 @@ type SettingsServiceInterface interface {
 }
 
 type SettingsServiceImpl struct {
-	repository Repositories.SettingsRepositoryInterface
+	repository  Repositories.SettingsRepositoryInterface
+	redisClient *config.RedisClient
 }
 
-func NewSettingsService(repository Repositories.SettingsRepositoryInterface) SettingsServiceInterface {
-	return &SettingsServiceImpl{repository: repository}
+func NewSettingsService(
+	repository Repositories.SettingsRepositoryInterface, client *config.RedisClient,
+) SettingsServiceInterface {
+	return &SettingsServiceImpl{repository: repository, redisClient: client}
 }
 
 func (s *SettingsServiceImpl) GetSettings() (dto.GeneralSettingsModel, error) {
-	settings, err := s.repository.GetSettings()
+
+	redis, err := s.redisClient.Get("settings")
+	var settings dto.GeneralSettingsModel
+
+	if err != nil {
+		settings, err = s.repository.GetSettings()
+		settingsValue, _ := json.Marshal(settings)
+
+		s.redisClient.Set("settings", string(settingsValue))
+	} else {
+		err = json.Unmarshal([]byte(redis), &settings)
+	}
 
 	return settings, err
 
