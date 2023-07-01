@@ -32,6 +32,7 @@ func (r *RelatedProductRepositoryImpl) FindAllRelatedProducts(groupCompanyId flo
 	var products []model.Product
 
 	groupCompanyIdInt := int(groupCompanyId)
+	limit := 12
 
 	query := r.db.Table("related_products").
 		Select(
@@ -59,11 +60,12 @@ func (r *RelatedProductRepositoryImpl) FindAllRelatedProducts(groupCompanyId flo
 				"INNER JOIN product_prices pp ON pp.product_id = products.id AND pp.company_price_id  <=  ? AND pp.price != 0 ",
 				groupCompanyIdInt,
 			)
+		limit = 70
 	}
 
 	err := query.Where(
 		"products.is_active =? AND related_products.product_id =?", true, productId,
-	).Order(" rand()").Limit(12).Find(&products).Error
+	).Order(" rand()").Limit(limit).Find(&products).Error
 
 	if groupCompanyIdInt != 0 {
 
@@ -82,6 +84,7 @@ func (r *RelatedProductRepositoryImpl) FindDummyRelatedProducts(groupCompanyId f
 	var products []model.Product
 
 	groupCompanyIdInt := int(groupCompanyId)
+	limit := 12
 
 	query := r.db.Table("products").
 		Select(
@@ -108,11 +111,12 @@ func (r *RelatedProductRepositoryImpl) FindDummyRelatedProducts(groupCompanyId f
 				"INNER JOIN product_prices pp ON pp.product_id = products.id AND pp.company_price_id  <=  ? AND pp.price != 0 ",
 				groupCompanyIdInt,
 			)
+		limit = 70
 	}
 
 	err := query.Where(
 		"products.is_active =? ", true,
-	).Order(" rand()").Limit(12).Find(&products).Error
+	).Order(" rand()").Limit(limit).Find(&products).Error
 
 	if groupCompanyIdInt != 0 {
 
