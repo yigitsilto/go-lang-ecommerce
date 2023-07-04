@@ -3,7 +3,6 @@ package config
 import (
 	"github.com/go-redis/redis"
 	"os"
-	"time"
 )
 
 type RedisClient struct {
@@ -32,7 +31,7 @@ func (r *RedisClient) Get(key string) (string, error) {
 }
 
 func (r *RedisClient) Set(key string, value string) error {
-	err := r.client.Set(key, value, 60*time.Minute).Err()
+	err := r.client.Set(key, value, 0).Err()
 	if err != nil {
 		return err
 	}
