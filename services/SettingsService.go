@@ -26,7 +26,8 @@ func (s *SettingsServiceImpl) GetSettings() (dto.GeneralSettingsModel, error) {
 
 	redis, err := s.redisClient.Get("settings")
 	var settings dto.GeneralSettingsModel
-
+	settings, err = s.repository.GetSettings() // todo unutma sil
+	return settings, err
 	if err != nil {
 		settings, err = s.repository.GetSettings()
 		settingsValue, _ := json.Marshal(settings)

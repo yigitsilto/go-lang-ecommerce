@@ -81,13 +81,13 @@ func (s *SettingsRepositoryImpl) getMenus(settingsMap map[string]string) ([]dto.
 				"INNER JOIN menu_item_translations mt ON mt.menu_item_id = mi.id ", true,
 		).
 		Where(
-			"menus.is_active =? AND mt.name != ? AND menus.id =? AND mi.parent_id = ?", true, "root",
-			settingsMap["storefront_primary_menu"], 6,
+			"menus.is_active =? AND mt.name != ? AND menus.id =? ", true, "root",
+			settingsMap["storefront_primary_menu"],
 		).
 		Find(&menus).
 		Error
 
-	return menus, err
+	return s.buildMenuTrees(menus), err
 
 }
 
@@ -131,19 +131,22 @@ func (s *SettingsRepositoryImpl) getFooter2(settingsMap map[string]string) ([]dt
 
 }
 
-/*
 func (s *SettingsRepositoryImpl) buildMenuTrees(menus []dto.MenuModel) []dto.MenuModel {
+	var menuTree []dto.MenuModel
 
-	var child dto.SubMenuModel
-
-	for _, item := range menus {
-
-		if item.IsRoot {
-
+	for i := range menus {
+		for j := range menus {
+			if menus[i].Id == menus[j].ParentId {
+				menus[i].Items = append(menus[i].Items, menus[j])
+			}
 		}
-
 	}
 
-	return nil
+	for _, menu := range menus {
+		if menu.ParentId == 6 {
+			menuTree = append(menuTree, menu)
+		}
+	}
+
+	return menuTree
 }
-*/

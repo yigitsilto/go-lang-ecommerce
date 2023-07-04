@@ -13,15 +13,11 @@ type GeneralSettingsModel struct {
 }
 
 type MenuModel struct {
-	Id       uint           `json:"id"`
-	Type     string         `json:"type"`
-	Url      string         `json:"url"`
-	Name     string         `json:"name"`
-	IsRoot   string         `json:"is_root"`
-	ParentId uint           `json:"parentId"`
-	Items    []SubMenuModel `json:"items" gorm:"-"`
-}
-
-type SubMenuModel struct {
-	MenuModel
+	Id       uint        `json:"id"`
+	Type     string      `json:"type"`
+	Url      string      `json:"url"`
+	Name     string      `json:"name"`
+	IsRoot   string      `json:"is_root"`
+	ParentId uint        `json:"parentId"`
+	Items    []MenuModel `json:"items" gorm:"-"`
 }
