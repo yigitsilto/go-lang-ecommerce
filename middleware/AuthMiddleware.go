@@ -5,6 +5,7 @@ import (
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
 	"net/http"
+	"os"
 	"strings"
 )
 
@@ -22,7 +23,7 @@ func AuthMiddleware(c *gin.Context) {
 				// JWT tokenin doğrulanacağı gizli anahtar veya RSA PublicKey gibi bir yapıyı döndürün.
 				// Burada tokenin doğrulanacağı algoritmayı ve gerekli anahtarı sağlamanız gerekmektedir.
 				// Örneğin:
-				return []byte("4ruYgZPR6DuhlMZU0kTUBkNMzuE5e1KFh0jNvMdUyG8lo9xq10g7iChetp9escvx"), nil
+				return []byte(os.Getenv("JWT_SECRET")), nil
 			},
 		)
 
