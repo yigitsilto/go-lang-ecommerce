@@ -69,12 +69,6 @@ func (r *RelatedProductRepositoryImpl) FindAllRelatedProducts(groupCompanyId flo
 		"products.is_active =? AND related_products.product_id =?", true, productId,
 	).Order(" rand()").Limit(limit).Find(&products).Error
 
-	if groupCompanyIdInt != 0 {
-
-		products = r.productUtil.UniqueProductsWithPriceCalculation(products, "orderByIdAsc")
-
-	}
-
 	r.productUtil.BuildProducts(products)
 
 	return products, err
@@ -121,12 +115,6 @@ func (r *RelatedProductRepositoryImpl) FindDummyRelatedProducts(groupCompanyId f
 	err := query.Where(
 		"products.is_active =? ", true,
 	).Limit(limit).Find(&products).Error
-
-	if groupCompanyIdInt != 0 {
-
-		products = r.productUtil.UniqueProductsWithPriceCalculation(products, "orderByIdAsc")
-
-	}
 
 	r.productUtil.BuildProducts(products)
 

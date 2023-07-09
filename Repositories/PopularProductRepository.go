@@ -61,12 +61,6 @@ func (pp *PopularProductRepositoryImpl) GetAllRelatedProducts(companyGroupId flo
 		"products.is_active =?", true,
 	).Order(" rand()").Limit(20).Find(&popularProducts).Error
 
-	if groupCompanyIdInt != 0 {
-
-		popularProducts = pp.productUtil.UniqueProductsWithPriceCalculation(popularProducts, "orderByIdAsc")
-
-	}
-
 	pp.productUtil.BuildProducts(popularProducts)
 
 	return popularProducts, err

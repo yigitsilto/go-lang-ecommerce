@@ -115,10 +115,6 @@ func (p *ProductRepositoryImpl) FindPageableProductsByBrandSlug(
 		Find(&products).
 		Error
 
-	if groupCompanyIdInt != 0 {
-		products = p.productUtil.UniqueProductsWithPriceCalculation(products, orderBy)
-	}
-
 	p.productUtil.BuildProducts(products)
 
 	pagination := dto.Pagination{Data: products}
@@ -182,10 +178,6 @@ func (p *ProductRepositoryImpl) FindProductBySlug(slug string, groupCompanyId fl
 	err := query.
 		Find(&products).
 		Error
-
-	if groupCompanyIdInt != 0 {
-		products = p.productUtil.UniqueProductsWithPriceCalculation(products, "")
-	}
 
 	p.productUtil.BuildProducts(products)
 
@@ -263,10 +255,6 @@ func (p *ProductRepositoryImpl) FindPageableProductsByCategorySlug(
 		Limit(perPage).
 		Order(p.productUtil.BuildOrderByValues(&order)).
 		Find(&products).Error
-
-	if groupCompanyId != 0 {
-		products = p.productUtil.UniqueProductsWithPriceCalculation(products, order)
-	}
 
 	p.productUtil.BuildProducts(products)
 

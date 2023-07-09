@@ -4,13 +4,11 @@ import (
 	"ecommerce/dto"
 	"fmt"
 	"os"
-	"sort"
 )
 
 type ProductUtilInterface interface {
 	BuildProducts(products []dto.Product)
 	BuildOrderByValues(orderBy *string) string
-	UniqueProductsWithPriceCalculation(products []dto.Product, orderBy string) []dto.Product
 }
 
 type ProductUtilImpl struct {
@@ -37,30 +35,4 @@ func (pu *ProductUtilImpl) BuildOrderByValues(orderBy *string) string {
 	default:
 		return " products.created_at"
 	}
-}
-
-func (pu *ProductUtilImpl) UniqueProductsWithPriceCalculation(products []dto.Product, orderBy string) []dto.Product {
-
-	// Sıralama işlevlerini depolamak için bir map oluştur
-	sortFuncMap := map[string]func(i, j int) bool{
-		"orderByNameAsc": func(i, j int) bool {
-			return products[i].Name < products[j].Name
-		},
-		"orderByNameDesc": func(i, j int) bool {
-			return products[i].Name > products[j].Name
-		},
-		"orderByPriceAsc": func(i, j int) bool {
-			return products[i].Price < products[j].Price
-		},
-		"orderByPriceDesc": func(i, j int) bool {
-			return products[i].Price > products[j].Price
-		},
-	}
-
-	// Sıralama fonksiyonunu uygula
-	if sortFunc, ok := sortFuncMap[orderBy]; ok {
-		sort.SliceStable(products, sortFunc)
-	}
-
-	return products
 }
