@@ -32,7 +32,14 @@ func NewProductRepository(db *gorm.DB, productUtil utils.ProductUtilInterface) P
 func (p *ProductRepositoryImpl) GetFiltersForProduct() ([]dto.FilterModel, error) {
 	var filters []entities.Filters
 
-	err := p.db.Table("filters").Preload("Values").Where("status =?", true).Find(&filters).Error
+	err := p.db.Table("filters").Select("*").
+		Joins(
+			" INNER JOIN filter_values fv on filters.id = fv.filter_id ",
+		).
+		Joins("INNER JOIN product_filter_values pfv ON fv.id = pfv.filter_value_id").
+		Joins("INNER JOIN categories c ON c.slug = 'cilt-bakimi'").
+		Joins("INNER JOIN product_categories pc ON pfv.product_id = pc.product_id").
+		Where("filters.status =?", true).Find(&filters).Error
 
 	return convertToFilterModel(filters), err
 
@@ -78,7 +85,7 @@ func (p *ProductRepositoryImpl) FindPageableProductsByBrandSlug(
 
 	query := p.db.Table("products").
 		Select(
-			"products.id, products.slug, products.short_desc, products.price as price, products.special_price, products.qty, products.in_stock,"+
+			"products.id, products.slug, products.short_desc, products.tax,  products.price as price, products.special_price, products.qty, products.in_stock,"+
 				" brt.name AS brand_name, pt.name, "+
 				" f.path AS path, products.is_active, products.created_at, products.updated_at",
 		).
@@ -93,7 +100,7 @@ func (p *ProductRepositoryImpl) FindPageableProductsByBrandSlug(
 
 	if groupCompanyIdInt != 0 {
 		query = query.Select(
-			"products.id, products.slug, products.short_desc, pp.price as price, pp.company_price_id, products.special_price, products.qty, products.in_stock,"+
+			"products.id, products.slug, products.short_desc, products.tax,  pp.price as price, pp.company_price_id, products.special_price, products.qty, products.in_stock,"+
 				" brt.name AS brand_name, pt.name, "+
 				" f.path AS path, products.is_active, products.created_at, products.updated_at",
 		).
@@ -147,7 +154,7 @@ func (p *ProductRepositoryImpl) FindProductBySlug(slug string, groupCompanyId fl
 
 	query := p.db.Table("products").
 		Select(
-			"products.id, products.slug, products.short_desc, products.price as price, products.special_price, products.qty, products.in_stock,"+
+			"products.id, products.slug, products.short_desc, products.tax, products.price as price, products.special_price, products.qty, products.in_stock,"+
 				" brt.name AS brand_name, pt.name, "+
 				" f.path AS path, products.is_active, products.created_at, products.updated_at",
 		).
@@ -162,7 +169,7 @@ func (p *ProductRepositoryImpl) FindProductBySlug(slug string, groupCompanyId fl
 
 	if groupCompanyIdInt != 0 {
 		query = query.Select(
-			"products.id, products.slug, products.short_desc, pp.price as price, pp.company_price_id, products.special_price, products.qty, products.in_stock,"+
+			"products.id, products.slug, products.short_desc, products.tax,  pp.price as price, pp.company_price_id, products.special_price, products.qty, products.in_stock,"+
 				" brt.name AS brand_name, pt.name, "+
 				" f.path AS path, products.is_active, products.created_at, products.updated_at",
 		).
@@ -210,7 +217,7 @@ func (p *ProductRepositoryImpl) FindPageableProductsByCategorySlug(
 
 	query := p.db.Table("products").
 		Select(
-			"distinct products.id, products.slug, products.short_desc, products.price as price, products.special_price, products.qty, products.in_stock,"+
+			"distinct products.id, products.slug, products.tax,   products.short_desc, products.price as price, products.special_price, products.qty, products.in_stock,"+
 				" brt.name AS brand_name, pt.name, "+
 				" f.path AS path, products.is_active, products.created_at, products.updated_at",
 		).
@@ -236,7 +243,7 @@ func (p *ProductRepositoryImpl) FindPageableProductsByCategorySlug(
 
 	if groupCompanyIdInt != 0 {
 		query = query.Select(
-			"products.id, products.slug, products.short_desc, pp.price as price, pp.company_price_id, products.special_price, products.qty, products.in_stock,"+
+			"products.id, products.slug, products.short_desc, products.tax,   pp.price as price, pp.company_price_id, products.special_price, products.qty, products.in_stock,"+
 				" brt.name AS brand_name, pt.name, "+
 				" f.path AS path, products.is_active, products.created_at, products.updated_at",
 		).
