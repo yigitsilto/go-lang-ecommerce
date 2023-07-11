@@ -32,7 +32,7 @@ func NewProductRepository(db *gorm.DB, productUtil utils.ProductUtilInterface) P
 func (p *ProductRepositoryImpl) GetFiltersForProduct() ([]dto.FilterModel, error) {
 	var filters []entities.Filters
 
-	err := p.db.Table("filters").Preload("Values ").Where("status =?", true).Find(&filters).Error
+	err := p.db.Table("filters").Preload("Values").Where("status =?", true).Find(&filters).Error
 
 	return convertToFilterModel(filters), err
 
