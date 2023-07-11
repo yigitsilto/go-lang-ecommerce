@@ -32,14 +32,7 @@ func NewProductRepository(db *gorm.DB, productUtil utils.ProductUtilInterface) P
 func (p *ProductRepositoryImpl) GetFiltersForProduct() ([]dto.FilterModel, error) {
 	var filters []entities.Filters
 
-	err := p.db.Table("filters").Select("*").
-		Joins(
-			" INNER JOIN filter_values fv on filters.id = fv.filter_id ",
-		).
-		Joins("INNER JOIN product_filter_values pfv ON fv.id = pfv.filter_value_id").
-		Joins("INNER JOIN categories c ON c.slug = 'cilt-bakimi'").
-		Joins("INNER JOIN product_categories pc ON pfv.product_id = pc.product_id").
-		Where("filters.status =?", true).Find(&filters).Error
+	err := p.db.Table("filters").Preload("Values ").Where("status =?", true).Find(&filters).Error
 
 	return convertToFilterModel(filters), err
 
