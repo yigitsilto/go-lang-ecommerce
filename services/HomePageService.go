@@ -42,16 +42,20 @@ func (h *HomePageServiceImpl) GetHomePage(user *dto.User) (dto.HomePageModel, er
 	var popularProducts []dto.Product
 	var blogs []dto.BlogModel
 	var sliders []dto.Slider
+	var popularCategories []dto.PopularCategoryModel
 
 	userInformation, err := h.productRepository.GetUsersCompanyGroup(user)
 
 	popularProducts, _ = h.popularProductRepository.GetAllRelatedProducts(userInformation)
+
+	popularCategories, _ = h.popularProductRepository.GetAllPopularCategories()
 
 	homePageFromCache, err := h.retrieveDataFromCache(blogs, sliders)
 
 	if err == nil {
 		return dto.HomePageModel{
 			Products: popularProducts, Slider: homePageFromCache.Slider, BlogModel: homePageFromCache.BlogModel,
+			PopularCategories: popularCategories,
 		}, nil
 	}
 
@@ -59,6 +63,7 @@ func (h *HomePageServiceImpl) GetHomePage(user *dto.User) (dto.HomePageModel, er
 
 	return dto.HomePageModel{
 		Products: popularProducts, Slider: homePageModel.Slider, BlogModel: homePageModel.BlogModel,
+		PopularCategories: popularCategories,
 	}, err
 }
 

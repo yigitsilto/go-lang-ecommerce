@@ -9,9 +9,10 @@ type BlogModel struct {
 }
 
 type HomePageModel struct {
-	Products  []Product   `json:"products"`
-	BlogModel []BlogModel `json:"blogs"`
-	Slider    []Slider    `json:"sliders"`
+	Products          []Product              `json:"products"`
+	BlogModel         []BlogModel            `json:"blogs"`
+	Slider            []Slider               `json:"sliders"`
+	PopularCategories []PopularCategoryModel `json:"populerCategories"`
 }
 
 type Slider struct {

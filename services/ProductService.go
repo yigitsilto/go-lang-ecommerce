@@ -11,7 +11,7 @@ type ProductService interface {
 	GetProductsByCategorySlug(slug string, page int, filterBy string, order string, user *dto.User) (
 		dto.Pagination, error,
 	)
-	FindFiltersForProduct() ([]dto.FilterModel, error)
+	FindFiltersForProduct(categorySlug string, filterId string) ([]dto.FilterModel, error)
 }
 
 type ProductServiceImpl struct {
@@ -41,9 +41,9 @@ func (p *ProductServiceImpl) FindProductBySlug(slug string, user *dto.User) (dto
 	return product, err
 }
 
-func (p *ProductServiceImpl) FindFiltersForProduct() ([]dto.FilterModel, error) {
+func (p *ProductServiceImpl) FindFiltersForProduct(categorySlug string, filterId string) ([]dto.FilterModel, error) {
 
-	filters, err := p.productRepository.GetFiltersForProduct()
+	filters, err := p.productRepository.GetFiltersForProduct(categorySlug, filterId)
 
 	return filters, err
 }

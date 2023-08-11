@@ -17,7 +17,7 @@ type ProductRepository interface {
 	FindPageableProductsByCategorySlug(
 		slug string, page int, filterBy string, order string, groupCompanyId float64,
 	) (dto.Pagination, error)
-	GetFiltersForProduct() ([]dto.FilterModel, error)
+	GetFiltersForProduct(categorySlug string, filterId string) ([]dto.FilterModel, error)
 }
 
 type ProductRepositoryImpl struct {
@@ -29,10 +29,31 @@ func NewProductRepository(db *gorm.DB, productUtil utils.ProductUtilInterface) P
 	return &ProductRepositoryImpl{db: db, productUtil: productUtil}
 }
 
-func (p *ProductRepositoryImpl) GetFiltersForProduct() ([]dto.FilterModel, error) {
+func (p *ProductRepositoryImpl) GetFiltersForProduct(categorySlug string, filterId string) ([]dto.FilterModel, error) {
 	var filters []entities.Filters
 
-	err := p.db.Table("filters").Preload("Values").Where("status =?", true).Find(&filters).Error
+	var filterValueIds []int
+	var categoryId int
+	err := p.db.Table("categories").Select("id").Where("slug=?", categorySlug).Pluck("id", &categoryId).Error
+
+	subquery := p.db.Table("products p").
+		Joins(
+			"INNER JOIN product_categories pc ON p.id = pc.product_id AND p.is_active=? AND pc.category_id = ?", true,
+			categoryId,
+		)
+
+	subquery = subquery.Select("p.id")
+
+	err = p.db.Table("filter_values").
+		Joins("INNER JOIN product_filter_values pfv ON filter_values.id = pfv.filter_value_id").
+		Where("pfv.product_id IN (?)", subquery).
+		Select("filter_values.id as filter_value_id").
+		Group("filter_value_id").
+		Find(&filterValueIds).Error
+
+	err = p.db.Table("filters").Preload("Values", "id IN(?)", filterValueIds).Where(
+		"status =?", true,
+	).Find(&filters).Error
 
 	return convertToFilterModel(filters), err
 
@@ -227,11 +248,17 @@ func (p *ProductRepositoryImpl) FindPageableProductsByCategorySlug(
 		)
 
 	if filterBy != "" {
-		filterArray := strings.Split(filterBy, ",")
-		query = query.Where(
-			"EXISTS (SELECT 1 FROM product_filter_values AS pfv WHERE pfv.product_id = products.id AND pfv.filter_value_id IN (?))",
-			filterArray,
+		query.Where(
+			"EXISTS (SELECT 1 FROM product_filter_values AS pfv WHERE pfv.product_id = products.id)",
 		)
+		filterArray := strings.Split(filterBy, ",")
+		for _, f := range filterArray {
+			query.Where(
+				" products.id IN ( select pfv1.product_id from product_filter_values pfv1 WHERE pfv1.filter_value_id =?   )",
+				f,
+			)
+		}
+
 	}
 
 	if groupCompanyIdInt != 0 {

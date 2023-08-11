@@ -8,6 +8,7 @@ import (
 
 type PopularProductRepository interface {
 	GetAllRelatedProducts(companyGroupId float64) ([]model.Product, error)
+	GetAllPopularCategories() ([]model.PopularCategoryModel, error)
 }
 
 type PopularProductRepositoryImpl struct {
@@ -65,4 +66,20 @@ func (pp *PopularProductRepositoryImpl) GetAllRelatedProducts(companyGroupId flo
 
 	return popularProducts, err
 
+}
+
+func (pp *PopularProductRepositoryImpl) GetAllPopularCategories() ([]model.PopularCategoryModel, error) {
+
+	popularCategories := []model.PopularCategoryModel{}
+
+	err := pp.db.Select(" c.slug, ct.name, c.id, f.path").Table("popular_categories").Joins(
+		"INNER JOIN categories c ON c.id = popular_categories.category_id " +
+			"INNER JOIN category_translations ct ON ct.category_id = c.id " +
+			"LEFT JOIN entity_files ef ON ef.entity_type = 'Modules\\\\Category\\\\Entities\\\\Category' AND ef.entity_id = c.id and ef.zone = 'logo' " +
+			"LEFT JOIN files f ON f.id = ef.file_id",
+	).Find(&popularCategories).Error
+
+	pp.productUtil.BuildPopularCategory(popularCategories)
+
+	return popularCategories, err
 }

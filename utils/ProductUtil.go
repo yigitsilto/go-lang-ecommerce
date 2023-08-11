@@ -8,6 +8,7 @@ import (
 
 type ProductUtilInterface interface {
 	BuildProducts(products []dto.Product)
+	BuildPopularCategory(categories []dto.PopularCategoryModel)
 	BuildOrderByValues(orderBy *string) string
 }
 
@@ -21,6 +22,14 @@ func (pu *ProductUtilImpl) BuildProducts(products []dto.Product) {
 		products[index].Price = productPrice
 		products[index].SpecialPriceFormatted = fmt.Sprintf("%.2f TRY", specialPrice)
 		products[index].Path = os.Getenv("IMAGE_APP_URL") + product.Path
+	}
+}
+
+func (pu *ProductUtilImpl) BuildPopularCategory(categories []dto.PopularCategoryModel) {
+	for index, category := range categories {
+		if category.Path != "" {
+			categories[index].Path = os.Getenv("IMAGE_APP_URL") + category.Path
+		}
 	}
 }
 
