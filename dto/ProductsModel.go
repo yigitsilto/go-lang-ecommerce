@@ -17,3 +17,8 @@ type Product struct {
 	BrandName             string  `json:"brand_name"`
 	Tax                   float64 `gorm:"type:decimal(18,4) unsigned" json:"tax"`
 }
+
+type FilterIdValues struct {
+	FilterId string `gorm:"not null" json:"filter_id"`
+	Id       string `gorm:"not null" json:"id"`
+}

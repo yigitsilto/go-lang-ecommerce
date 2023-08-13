@@ -252,10 +252,20 @@ func (p *ProductRepositoryImpl) FindPageableProductsByCategorySlug(
 			"EXISTS (SELECT 1 FROM product_filter_values AS pfv WHERE pfv.product_id = products.id)",
 		)
 		filterArray := strings.Split(filterBy, ",")
-		for _, f := range filterArray {
+		var filterValues []dto.FilterIdValues
+		p.db.Select("filter_id, id").Table("filter_values").Where(
+			"id IN (?)", filterArray,
+		).Find(&filterValues)
+		filterValueIDs := make(map[string][]string)
+
+		for _, filterValue := range filterValues {
+			filterValueIDs[filterValue.FilterId] = append(filterValueIDs[filterValue.FilterId], filterValue.Id)
+		}
+
+		for _, ids := range filterValueIDs {
 			query.Where(
-				" products.id IN ( select pfv1.product_id from product_filter_values pfv1 WHERE pfv1.filter_value_id =?   )",
-				f,
+				" products.id IN (select pfv1.product_id from product_filter_values pfv1 WHERE pfv1.filter_value_id IN (?))",
+				ids,
 			)
 		}
 
