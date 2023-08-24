@@ -7,6 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 	"log"
+	"time"
 )
 
 func CORSMiddleware() gin.HandlerFunc {
@@ -43,6 +44,7 @@ func main() {
 }
 
 func loadDatabase() {
+	time.Sleep(1 * time.Minute)
 	database.Connect()
 	//database.Database.AutoMigrate(&model.Brand{})
 }
