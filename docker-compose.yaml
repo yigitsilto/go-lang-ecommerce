@@ -1,32 +1,12 @@
-version: '3.5'
+version: '3.8'
 
 services:
-  mysql:
-    container_name: goLangEcommerce
-    image: mysql:latest
-    environment:
-      MYSQL_ROOT_USER: root
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: fleetcart
-    volumes:
-     # - mysql-db:/var/lib/mysql
-      - ./sql/:/docker-entrypoint-initdb.d
+  go:
+    build:
+      context: .
+      dockerfile: ./DockerFile
+    networks:
+      - ecommerce_backend-db  # Use the same network as MySQL
     ports:
-      - "3306:3306"
-  phpmyadmin:
-    image: phpmyadmin/phpmyadmin
-    container_name: pmadmin
-    links:
-      - mysql
-    environment:
-      PMA_HOST: mysql
-      MYSQL_ROOT_PASSWORD: root
-      PMA_PORT: 3306
-    restart: always
-    ports:
-      - "8001:80"
+      - "8443:8443"
 
-
-volumes:
-  mysql-db:
-    driver: local
