@@ -1,13 +1,5 @@
 package dto
 
-type BlogModel struct {
-	BaseModel
-	Slug             string `gorm:"size:255;not null;unique" json:"slug"`
-	Title            string `json:"title"`
-	ShortDescription string `json:"short_description"`
-	CoverImage       string `json:"cover_image"`
-}
-
 type HomePageModel struct {
 	Products          []Product              `json:"products"`
 	BlogModel         []BlogModel            `json:"blogs"`

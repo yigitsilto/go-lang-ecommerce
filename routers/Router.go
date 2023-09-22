@@ -15,13 +15,15 @@ func RegisterRoutes(router *gin.Engine) {
 	redisClient := config.NewRedisClient()
 	productUtil := utils.ProductUtilImpl{}
 
+	// blog repository
+	blogRepository := Repositories.NewBlogRepository(db)
+
 	// dependency injections for brands
 	brandRepository := Repositories.NewBrandRepository(db)
 	brandService := services.NewBrandService(brandRepository)
 	brandController := controllers.NewBrandController(brandService)
 
 	// dependency injections for homePage
-	blogRepository := Repositories.NewBlogRepository(db)
 	sliderRepository := Repositories.NewSliderRepository(db)
 	productRepository := Repositories.NewProductRepository(db, &productUtil)
 	popularProductsRepository := Repositories.NewPopularProductRepository(db, &productUtil)
@@ -44,6 +46,10 @@ func RegisterRoutes(router *gin.Engine) {
 	settingsService := services.NewSettingsService(settingsRepository, redisClient)
 	settingsController := controllers.NewSettingController(settingsService)
 
+	// blogs dependency injections
+	blogService := services.NewBlogService(blogRepository)
+	blogController := controllers.NewBlogController(blogService)
+
 	// Register the routers for brands.
 	router.GET("/api/brands", brandController.GetAllBrands)
 	router.GET("/api/brands/:id", brandController.FindById)
@@ -62,5 +68,9 @@ func RegisterRoutes(router *gin.Engine) {
 
 	// settings
 	router.GET("/api/settings", settingsController.GetSettings)
+
+	// blogs
+	router.GET("/api/blogs", blogController.GetAllBlogs)
+	router.GET("/api/blogs/:slug", blogController.FindById)
 
 }
