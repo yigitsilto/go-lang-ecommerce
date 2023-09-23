@@ -50,6 +50,11 @@ func RegisterRoutes(router *gin.Engine) {
 	blogService := services.NewBlogService(blogRepository)
 	blogController := controllers.NewBlogController(blogService)
 
+	// auth dependency injections
+	userRepository := Repositories.NewUserRepository(db)
+	authService := services.NewAuthService(userRepository)
+	authController := controllers.NewAuthController(authService)
+
 	// Register the routers for brands.
 	router.GET("/api/brands", brandController.GetAllBrands)
 	router.GET("/api/brands/:id", brandController.FindById)
@@ -72,5 +77,8 @@ func RegisterRoutes(router *gin.Engine) {
 	// blogs
 	router.GET("/api/blogs", blogController.GetAllBlogs)
 	router.GET("/api/blogs/:slug", blogController.FindById)
+
+	// auth
+	router.GET("/api/auth/me", authController.GetMe)
 
 }
