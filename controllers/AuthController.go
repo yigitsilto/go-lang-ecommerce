@@ -25,5 +25,5 @@ func (h *AuthController) GetMe(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, user)
+	c.JSON(http.StatusOK, gin.H{"user": user})
 }
