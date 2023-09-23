@@ -1,6 +1,7 @@
 package dto
 
 type UserMeModel struct {
+	Id             string  `gorm:"not null" json:"id"`
 	FirstName      string  `json:"first_name"`
 	LastName       string  `json:"last_name"`
 	Phone          string  `json:"phone"`
