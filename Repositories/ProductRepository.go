@@ -99,7 +99,7 @@ func (p *ProductRepositoryImpl) FindPageableProductsByBrandSlug(
 
 	query := p.db.Table("products").
 		Select(
-			"products.id, products.slug, products.short_desc as short_description, products.tax,  products.price as price, products.special_price, products.qty, products.in_stock,"+
+			"products.id, products.product_order, products.slug, products.short_desc as short_description, products.tax,  products.price as price, products.special_price, products.qty, products.in_stock,"+
 				" brt.name AS brand_name, pt.name, "+
 				" f.path AS path, products.is_active, products.created_at, products.updated_at",
 		).
@@ -114,7 +114,7 @@ func (p *ProductRepositoryImpl) FindPageableProductsByBrandSlug(
 
 	if groupCompanyIdInt != 0 {
 		query = query.Select(
-			"products.id, products.slug, products.short_desc as short_description, products.tax,  pp.price as price, pp.company_price_id, products.special_price, products.qty, products.in_stock,"+
+			"products.id, products.product_order, products.product_order, products.slug, products.short_desc as short_description, products.tax,  pp.price as price, pp.company_price_id, products.special_price, products.qty, products.in_stock,"+
 				" brt.name AS brand_name, pt.name, "+
 				" f.path AS path, products.is_active, products.created_at, products.updated_at",
 		).
@@ -231,7 +231,7 @@ func (p *ProductRepositoryImpl) FindPageableProductsByCategorySlug(
 
 	query := p.db.Table("products").
 		Select(
-			"distinct products.id, products.slug, products.tax,   products.short_desc as short_description, products.price as price, products.special_price, products.qty, products.in_stock,"+
+			"distinct products.id, products.slug, products.tax,  products.product_order,  products.short_desc as short_description, products.price as price, products.special_price, products.qty, products.in_stock,"+
 				" brt.name AS brand_name, pt.name, "+
 				" f.path AS path, products.is_active, products.created_at, products.updated_at",
 		).
@@ -273,7 +273,7 @@ func (p *ProductRepositoryImpl) FindPageableProductsByCategorySlug(
 
 	if groupCompanyIdInt != 0 {
 		query = query.Select(
-			"products.id, products.slug, products.short_desc as short_description, products.tax,   pp.price as price, pp.company_price_id, products.special_price, products.qty, products.in_stock,"+
+			"products.id, products.slug, products.product_order, products.short_desc as short_description, products.tax,   pp.price as price, pp.company_price_id, products.special_price, products.qty, products.in_stock,"+
 				" brt.name AS brand_name, pt.name, "+
 				" f.path AS path, products.is_active, products.created_at, products.updated_at",
 		).

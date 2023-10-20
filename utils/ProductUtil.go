@@ -56,6 +56,6 @@ func (pu *ProductUtilImpl) BuildOrderByValues(orderBy *string) string {
 	case "orderByNameDesc":
 		return " pt.name desc"
 	default:
-		return " products.created_at"
+		return " products.product_order asc"
 	}
 }
