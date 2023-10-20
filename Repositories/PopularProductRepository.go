@@ -30,7 +30,7 @@ func (pp *PopularProductRepositoryImpl) GetAllRelatedProducts(companyGroupId flo
 
 	query := pp.db.Table("popular_products").
 		Select(
-			"products.id, products.slug, products.tax,  products.short_desc as short_description, products.price, products.special_price, products.qty, products.in_stock," +
+			"products.id, products.slug, products.tax, products.product_order,  products.short_desc as short_description, products.price, products.special_price, products.qty, products.in_stock," +
 				" brt.name AS brand_name, pt.name, " +
 				" f.path AS path, products.is_active, popular_products.created_at, popular_products.updated_at",
 		).
@@ -46,7 +46,7 @@ func (pp *PopularProductRepositoryImpl) GetAllRelatedProducts(companyGroupId flo
 	if groupCompanyIdInt != 0 {
 
 		query = query.Select(
-			"products.id, products.slug, products.tax,  products.short_desc as short_description, pp.price as price, pp.company_price_id, products.special_price, products.qty, products.in_stock,"+
+			"products.id, products.slug, products.tax,  products.product_order, products.short_desc as short_description, pp.price as price, pp.company_price_id, products.special_price, products.qty, products.in_stock,"+
 				" brt.name AS brand_name, pt.name, "+
 				" f.path AS path, products.is_active, popular_products.created_at, popular_products.updated_at",
 		).
@@ -60,7 +60,7 @@ func (pp *PopularProductRepositoryImpl) GetAllRelatedProducts(companyGroupId flo
 
 	err := query.Where(
 		"products.is_active =?", true,
-	).Order(" rand()").Limit(20).Find(&popularProducts).Error
+	).Order("products.product_order").Limit(20).Find(&popularProducts).Error
 
 	pp.productUtil.BuildProducts(popularProducts)
 
