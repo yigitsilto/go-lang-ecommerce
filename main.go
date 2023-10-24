@@ -39,7 +39,8 @@ func main() {
 
 	routes.RegisterRoutes(r)
 
-	r.RunTLS(":8443", "./cert.cert", "key.key")
+	//r.RunTLS(":8443", "./cert.cert", "key.key")
+	r.Run(":8443")
 }
 
 func loadDatabase() {
