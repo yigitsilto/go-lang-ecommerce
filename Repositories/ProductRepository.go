@@ -105,8 +105,8 @@ func (p *ProductRepositoryImpl) FindPageableProductsByBrandSlug(
 		).
 		Joins(
 			"INNER JOIN product_translations pt ON pt.product_id = products.id "+
-				"LEFT JOIN entity_files ef ON ef.entity_type = 'Modules\\\\Product\\\\Entities\\\\Product' AND ef.entity_id = products.id and ef.zone = 'base_image' "+
-				"LEFT JOIN files f ON f.id = ef.file_id "+
+				"INNER JOIN entity_files ef ON ef.entity_type = 'Modules\\\\Product\\\\Entities\\\\Product' AND ef.entity_id = products.id and ef.zone = 'base_image' "+
+				"INNER JOIN files f ON f.id = ef.file_id "+
 				"INNER JOIN brands br ON br.id = products.brand_id "+
 				"INNER JOIN brand_translations brt ON brt.brand_id = br.id",
 		).
