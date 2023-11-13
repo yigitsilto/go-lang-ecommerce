@@ -136,7 +136,7 @@ func (p *ProductRepositoryImpl) FindPageableProductsByBrandSlug(
 		Find(&products).
 		Error
 
-	p.productUtil.BuildProducts(products)
+	p.productUtil.BuildProducts(products, groupCompanyIdInt)
 
 	pagination := dto.Pagination{Data: products}
 
@@ -200,7 +200,7 @@ func (p *ProductRepositoryImpl) FindProductBySlug(slug string, groupCompanyId fl
 		Find(&products).
 		Error
 
-	p.productUtil.BuildProducts(products)
+	p.productUtil.BuildProducts(products, groupCompanyIdInt)
 
 	return products[0], err
 
@@ -293,7 +293,7 @@ func (p *ProductRepositoryImpl) FindPageableProductsByCategorySlug(
 		Order(p.productUtil.BuildOrderByValues(&order)).
 		Find(&products).Error
 
-	p.productUtil.BuildProducts(products)
+	p.productUtil.BuildProducts(products, groupCompanyIdInt)
 
 	pagination := dto.Pagination{Data: products}
 

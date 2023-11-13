@@ -7,7 +7,7 @@ import (
 )
 
 type ProductUtilInterface interface {
-	BuildProducts(products []dto.Product)
+	BuildProducts(products []dto.Product, groupCompanyIdInt int)
 	BuildPopularCategory(categories []dto.PopularCategoryModel)
 	BuildOrderByValues(orderBy *string) string
 }
@@ -15,12 +15,19 @@ type ProductUtilInterface interface {
 type ProductUtilImpl struct {
 }
 
-func (pu *ProductUtilImpl) BuildProducts(products []dto.Product) {
+func (pu *ProductUtilImpl) BuildProducts(products []dto.Product, companyId int) {
 	for index, product := range products {
 		productPrice, specialPrice := pu.calculateTax(product)
 		products[index].PriceFormatted = fmt.Sprintf("%.2f TRY", productPrice)
 		products[index].Price = productPrice
-		products[index].SpecialPriceFormatted = fmt.Sprintf("%.2f TRY", specialPrice)
+		if companyId > 1 {
+			products[index].SpecialPrice = 0
+			products[index].SpecialPriceFormatted = fmt.Sprintf("%.2f TRY", 0)
+		} else {
+			products[index].SpecialPrice = specialPrice
+			products[index].SpecialPriceFormatted = fmt.Sprintf("%.2f TRY", specialPrice)
+		}
+
 		products[index].Path = os.Getenv("IMAGE_APP_URL") + product.Path
 	}
 }
