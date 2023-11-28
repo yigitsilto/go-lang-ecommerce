@@ -60,7 +60,7 @@ func (pp *PopularProductRepositoryImpl) GetAllRelatedProducts(companyGroupId flo
 
 	err := query.Where(
 		"products.is_active =?", true,
-	).Order("products.product_order").Limit(20).Find(&popularProducts).Error
+	).Order("popular_products.sort_order").Limit(20).Find(&popularProducts).Error
 
 	pp.productUtil.BuildProducts(popularProducts, groupCompanyIdInt)
 
