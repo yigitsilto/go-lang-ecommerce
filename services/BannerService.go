@@ -2,7 +2,9 @@ package services
 
 import (
 	"ecommerce/Repositories"
+	"ecommerce/config"
 	model "ecommerce/dto"
+	"encoding/json"
 )
 
 type BannerService interface {
@@ -10,15 +12,31 @@ type BannerService interface {
 }
 
 type BannerServiceImpl struct {
-	repository Repositories.BannerRepository
+	repository  Repositories.BannerRepository
+	redisClient *config.RedisClient
 }
 
-func NewBannerService(repository Repositories.BannerRepository) BannerService {
+func NewBannerService(repository Repositories.BannerRepository, client *config.RedisClient) BannerService {
 	return &BannerServiceImpl{
-		repository: repository,
+		repository:  repository,
+		redisClient: client,
 	}
 }
 
 func (s *BannerServiceImpl) GetBanners() ([]model.Banner, error) {
-	return s.repository.GetBanners()
+
+	var banners []model.Banner
+
+	redis, err := s.redisClient.Get("banners")
+
+	if err != nil {
+		banners, err = s.repository.GetBanners()
+		bannersValue, _ := json.Marshal(banners)
+		s.redisClient.Set("banners", string(bannersValue))
+
+	} else {
+		err = json.Unmarshal([]byte(redis), &banners)
+	}
+
+	return banners, err
 }

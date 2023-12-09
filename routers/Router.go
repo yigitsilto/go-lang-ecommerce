@@ -71,7 +71,7 @@ func RegisterRoutes(router *gin.Engine) {
 
 	// banners DI
 	bannerRepository := Repositories.NewBannerRepository(db, &productUtil)
-	bannerService := services.NewBannerService(bannerRepository)
+	bannerService := services.NewBannerService(bannerRepository, redisClient)
 	bannerController := controllers.NewBannerController(bannerService)
 
 	// TODO home page yeni temaya geçilince kaldırılacak
