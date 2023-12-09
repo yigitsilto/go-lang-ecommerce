@@ -69,10 +69,18 @@ func RegisterRoutes(router *gin.Engine) {
 	popularCategoriesService := services.NewPopularCategoriesService(popularProductsRepository, redisClient)
 	popularCategoriesController := controllers.NewPopularCategoryController(popularCategoriesService)
 
+	// banners DI
+	bannerRepository := Repositories.NewBannerRepository(db, &productUtil)
+	bannerService := services.NewBannerService(bannerRepository)
+	bannerController := controllers.NewBannerController(bannerService)
+
 	// TODO home page yeni temaya geçilince kaldırılacak
 	// Register the routers for brands.
 	router.GET("/api/brands", brandController.GetAllBrands)
 	router.GET("/api/brands/:id", brandController.FindById)
+
+	// Register the routers for banners.
+	router.GET("/api/banners", bannerController.GetAllBanners)
 
 	// Register the routers for sliders
 	router.GET("/api/sliders", sliderController.GetSlider)

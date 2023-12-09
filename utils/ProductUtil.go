@@ -10,6 +10,7 @@ type ProductUtilInterface interface {
 	BuildProducts(products []dto.Product, groupCompanyIdInt int)
 	BuildPopularCategory(categories []dto.PopularCategoryModel)
 	BuildOrderByValues(orderBy *string) string
+	BuildImagePaths(imagePath string) string
 }
 
 type ProductUtilImpl struct {
@@ -65,4 +66,10 @@ func (pu *ProductUtilImpl) BuildOrderByValues(orderBy *string) string {
 	default:
 		return " products.product_order asc"
 	}
+}
+
+func (pu *ProductUtilImpl) BuildImagePaths(imagePath string) string {
+
+	return os.Getenv("IMAGE_APP_URL") + imagePath
+
 }
