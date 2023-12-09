@@ -7,6 +7,7 @@ type Product struct {
 	Name                  string  `json:"name"`
 	ShortDescription      string  `json:"short_description"`
 	Path                  string  `json:"path"`
+	SecondImage           string  `json:"second_image"`
 	Qty                   int     `json:"qty"`
 	InStock               bool    `json:"in_stock"`
 	CompanyPriceId        int     `json:"company_price_id"`

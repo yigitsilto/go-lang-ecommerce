@@ -32,9 +32,10 @@ func (pp *PopularProductRepositoryImpl) GetAllRelatedProducts(companyGroupId flo
 
 	query := pp.db.Table("popular_products").
 		Select(
-			"products.id, products.slug, products.tax, products.product_order,  products.short_desc as short_description, products.price, products.special_price, products.qty, products.in_stock," +
-				" brt.name AS brand_name, pt.name, " +
+			"products.id, products.slug, products.tax, products.product_order,  products.short_desc as short_description, products.price, products.special_price, products.qty, products.in_stock,"+
+				" brt.name AS brand_name, pt.name, "+
 				" f.path AS path, products.is_active, popular_products.created_at, popular_products.updated_at",
+			" (select fs.path from entity_files efs INNER JOIN files fs ON fs.id = efs.file_id WHERE efs.entity_id = products.id and efs.zone != 'base_image' ORDER BY efs.created_at LIMIT 1) as second_image ",
 		).
 		Joins(
 			"INNER JOIN products ON products.id = popular_products.product_id " +
@@ -51,6 +52,7 @@ func (pp *PopularProductRepositoryImpl) GetAllRelatedProducts(companyGroupId flo
 			"products.id, products.slug, products.tax,  products.product_order, products.short_desc as short_description, pp.price as price, pp.company_price_id, products.special_price, products.qty, products.in_stock,"+
 				" brt.name AS brand_name, pt.name, "+
 				" f.path AS path, products.is_active, popular_products.created_at, popular_products.updated_at",
+			" (select fs.path from entity_files efs INNER JOIN files fs ON fs.id = efs.file_id WHERE efs.entity_id = products.id and efs.zone != 'base_image' ORDER BY efs.created_at LIMIT 1) as second_image ",
 		).
 			Joins(
 				"INNER JOIN "+
@@ -80,9 +82,10 @@ func (pp *PopularProductRepositoryImpl) GetAllHiglightsProducts(companyGroupId f
 
 	query := pp.db.Table("highlights_products").
 		Select(
-			"products.id, products.slug, products.tax, products.product_order,  products.short_desc as short_description, products.price, products.special_price, products.qty, products.in_stock," +
-				" brt.name AS brand_name, pt.name, " +
+			"products.id, products.slug, products.tax, products.product_order,  products.short_desc as short_description, products.price, products.special_price, products.qty, products.in_stock,"+
+				" brt.name AS brand_name, pt.name, "+
 				" f.path AS path, products.is_active, highlights_products.created_at, highlights_products.updated_at",
+			" (select fs.path from entity_files efs INNER JOIN files fs ON fs.id = efs.file_id WHERE efs.entity_id = products.id and efs.zone != 'base_image' ORDER BY efs.created_at LIMIT 1) as second_image ",
 		).
 		Joins(
 			"INNER JOIN products ON products.id = highlights_products.product_id " +
@@ -99,6 +102,7 @@ func (pp *PopularProductRepositoryImpl) GetAllHiglightsProducts(companyGroupId f
 			"products.id, products.slug, products.tax,  products.product_order, products.short_desc as short_description, pp.price as price, pp.company_price_id, products.special_price, products.qty, products.in_stock,"+
 				" brt.name AS brand_name, pt.name, "+
 				" f.path AS path, products.is_active, highlights_products.created_at, highlights_products.updated_at",
+			" (select fs.path from entity_files efs INNER JOIN files fs ON fs.id = efs.file_id WHERE efs.entity_id = products.id and efs.zone != 'base_image' ORDER BY efs.created_at LIMIT 1) as second_image ",
 		).
 			Joins(
 				"INNER JOIN "+
@@ -130,7 +134,8 @@ func (pp *PopularProductRepositoryImpl) GetAllDailyPopularProducts(companyGroupI
 		Select(
 			"products.id, products.slug, products.tax, products.product_order,  products.short_desc as short_description, products.price, products.special_price, products.qty, products.in_stock," +
 				" brt.name AS brand_name, pt.name, " +
-				" f.path AS path, products.is_active, todays_popular_products.created_at, todays_popular_products.updated_at",
+				" f.path AS path, products.is_active, todays_popular_products.created_at, todays_popular_products.updated_at, " +
+				" (select fs.path from entity_files efs INNER JOIN files fs ON fs.id = efs.file_id WHERE efs.entity_id = products.id and efs.zone != 'base_image' ORDER BY efs.created_at LIMIT 1) as second_image ",
 		).
 		Joins(
 			"INNER JOIN products ON products.id = todays_popular_products.product_id " +
@@ -146,7 +151,8 @@ func (pp *PopularProductRepositoryImpl) GetAllDailyPopularProducts(companyGroupI
 		query = query.Select(
 			"products.id, products.slug, products.tax,  products.product_order, products.short_desc as short_description, pp.price as price, pp.company_price_id, products.special_price, products.qty, products.in_stock,"+
 				" brt.name AS brand_name, pt.name, "+
-				" f.path AS path, products.is_active, todays_popular_products.created_at, todays_popular_products.updated_at",
+				" f.path AS path, products.is_active, todays_popular_products.created_at, todays_popular_products.updated_at, "+
+				" (select fs.path from entity_files efs INNER JOIN files fs ON fs.id = efs.file_id WHERE efs.entity_id = products.id and efs.zone != 'base_image' ORDER BY efs.created_at LIMIT 1) as second_image ",
 		).
 			Joins(
 				"INNER JOIN "+

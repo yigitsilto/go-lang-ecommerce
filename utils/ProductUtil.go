@@ -30,6 +30,7 @@ func (pu *ProductUtilImpl) BuildProducts(products []dto.Product, companyId int) 
 		}
 
 		products[index].Path = os.Getenv("IMAGE_APP_URL") + product.Path
+		products[index].SecondImage = os.Getenv("IMAGE_APP_URL") + product.SecondImage
 	}
 }
 
