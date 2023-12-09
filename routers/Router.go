@@ -87,6 +87,8 @@ func RegisterRoutes(router *gin.Engine) {
 
 	// Register the routers for popular products
 	router.GET("/api/popular-products", popularProductController.GetPopularProducts)
+	router.GET("/api/highlights-products", popularProductController.GetHighlightsProducts)
+	router.GET("/api/daily-products", popularProductController.GetDailyPopularProducts)
 
 	// Register the routers for popular categories
 	router.GET("/api/popular-categories", popularCategoriesController.GetPopularCategories)

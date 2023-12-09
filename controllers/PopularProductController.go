@@ -35,3 +35,39 @@ func (h *PopularProductController) GetPopularProducts(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{"data": products})
 }
+
+func (h *PopularProductController) GetHighlightsProducts(c *gin.Context) {
+	user, _ := c.Get("user")
+	authUser := model.User{}
+	if user != nil {
+		authUser = user.(model.User)
+	}
+
+	products, err := h.popularProductService.GetHighlightsProducts(&authUser)
+
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"data": exceptions.ServerError.Error()})
+		return
+
+	}
+
+	c.JSON(http.StatusOK, gin.H{"data": products})
+}
+
+func (h *PopularProductController) GetDailyPopularProducts(c *gin.Context) {
+	user, _ := c.Get("user")
+	authUser := model.User{}
+	if user != nil {
+		authUser = user.(model.User)
+	}
+
+	products, err := h.popularProductService.GetDailyPopularProducts(&authUser)
+
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"data": exceptions.ServerError.Error()})
+		return
+
+	}
+
+	c.JSON(http.StatusOK, gin.H{"data": products})
+}

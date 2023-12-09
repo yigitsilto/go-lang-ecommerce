@@ -8,6 +8,8 @@ import (
 
 type PopularProductService interface {
 	GetPopularProducts(user *dto.User) ([]dto.Product, error)
+	GetHighlightsProducts(user *dto.User) ([]dto.Product, error)
+	GetDailyPopularProducts(user *dto.User) ([]dto.Product, error)
 }
 
 type PopularProductServiceImpl struct {
@@ -38,6 +40,40 @@ func (h *PopularProductServiceImpl) GetPopularProducts(user *dto.User) ([]dto.Pr
 	}
 
 	popularProducts, err = h.popularProductRepository.GetAllRelatedProducts(userInformation)
+	if err != nil {
+		return nil, err
+	}
+
+	return popularProducts, nil
+}
+
+func (h *PopularProductServiceImpl) GetHighlightsProducts(user *dto.User) ([]dto.Product, error) {
+	var popularProducts []dto.Product
+
+	userInformation, err := h.productRepository.GetUsersCompanyGroup(user)
+
+	if err != nil {
+		return nil, err
+	}
+
+	popularProducts, err = h.popularProductRepository.GetAllHiglightsProducts(userInformation)
+	if err != nil {
+		return nil, err
+	}
+
+	return popularProducts, nil
+}
+
+func (h *PopularProductServiceImpl) GetDailyPopularProducts(user *dto.User) ([]dto.Product, error) {
+	var popularProducts []dto.Product
+
+	userInformation, err := h.productRepository.GetUsersCompanyGroup(user)
+
+	if err != nil {
+		return nil, err
+	}
+
+	popularProducts, err = h.popularProductRepository.GetAllDailyPopularProducts(userInformation)
 	if err != nil {
 		return nil, err
 	}
