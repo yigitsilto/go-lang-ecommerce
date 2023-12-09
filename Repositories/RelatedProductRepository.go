@@ -36,9 +36,10 @@ func (r *RelatedProductRepositoryImpl) FindAllRelatedProducts(groupCompanyId flo
 
 	query := r.db.Table("related_products").
 		Select(
-			"products.id, products.slug, products.tax,  products.short_desc as short_description, products.price, products.special_price, products.qty, products.in_stock," +
-				" brt.name AS brand_name, pt.name, " +
+			"products.id, products.slug, products.tax,  products.short_desc as short_description, products.price, products.special_price, products.qty, products.in_stock,"+
+				" brt.name AS brand_name, pt.name, "+
 				" f.path AS path, products.is_active, products.created_at, products.updated_at",
+			" (select fs.path from entity_files efs INNER JOIN files fs ON fs.id = efs.file_id WHERE efs.entity_id = products.id and efs.zone != 'base_image' ORDER BY efs.created_at LIMIT 1) as second_image ",
 		).
 		Joins(
 			"INNER JOIN products products ON products.id = related_products.related_product_id " +
@@ -55,6 +56,7 @@ func (r *RelatedProductRepositoryImpl) FindAllRelatedProducts(groupCompanyId flo
 			"products.id, products.slug, products.tax,  products.short_desc as short_description, pp.price as price, pp.company_price_id, products.special_price, products.qty, products.in_stock,"+
 				" brt.name AS brand_name, pt.name, "+
 				" f.path AS path, products.is_active, products.created_at, products.updated_at",
+			" (select fs.path from entity_files efs INNER JOIN files fs ON fs.id = efs.file_id WHERE efs.entity_id = products.id and efs.zone != 'base_image' ORDER BY efs.created_at LIMIT 1) as second_image ",
 		).
 			Joins(
 				"INNER JOIN "+
@@ -84,9 +86,10 @@ func (r *RelatedProductRepositoryImpl) FindDummyRelatedProducts(groupCompanyId f
 
 	query := r.db.Table("products").
 		Select(
-			"products.id, products.slug, products.tax,  products.short_desc as short_description, products.price, products.special_price, products.qty, products.in_stock," +
-				" brt.name AS brand_name, pt.name, " +
+			"products.id, products.slug, products.tax,  products.short_desc as short_description, products.price, products.special_price, products.qty, products.in_stock,"+
+				" brt.name AS brand_name, pt.name, "+
 				" f.path AS path, products.is_active, products.created_at, products.updated_at",
+			" (select fs.path from entity_files efs INNER JOIN files fs ON fs.id = efs.file_id WHERE efs.entity_id = products.id and efs.zone != 'base_image' ORDER BY efs.created_at LIMIT 1) as second_image ",
 		).
 		Joins(
 			"INNER JOIN product_translations pt ON pt.product_id = products.id " +
@@ -102,6 +105,7 @@ func (r *RelatedProductRepositoryImpl) FindDummyRelatedProducts(groupCompanyId f
 			"products.id, products.slug, products.tax,  products.short_desc as short_description, pp.price as price, pp.company_price_id, products.special_price, products.qty, products.in_stock,"+
 				" brt.name AS brand_name, pt.name, "+
 				" f.path AS path, products.is_active, products.created_at, products.updated_at",
+			" (select fs.path from entity_files efs INNER JOIN files fs ON fs.id = efs.file_id WHERE efs.entity_id = products.id and efs.zone != 'base_image' ORDER BY efs.created_at LIMIT 1) as second_image ",
 		).
 			Joins(
 				"INNER JOIN "+
