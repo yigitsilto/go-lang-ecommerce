@@ -7,6 +7,7 @@ import (
 
 type BlogService interface {
 	GetAllBlogs() ([]dto.BlogModel, error)
+	GetAllBlogsByLimit() ([]dto.BlogModel, error)
 	FindById(slug string) (dto.BlogLongModel, error)
 }
 
@@ -22,6 +23,10 @@ func NewBlogService(repository Repositories.BlogRepository) BlogService {
 
 func (b *BlogServiceImpl) GetAllBlogs() ([]dto.BlogModel, error) {
 	return b.blogRepository.GetAllBlogs()
+}
+
+func (b *BlogServiceImpl) GetAllBlogsByLimit() ([]dto.BlogModel, error) {
+	return b.blogRepository.GetAllBlogsByLimit(3)
 }
 
 func (b *BlogServiceImpl) FindById(slug string) (dto.BlogLongModel, error) {

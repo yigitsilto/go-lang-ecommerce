@@ -43,6 +43,8 @@ func (s *SettingsRepositoryImpl) GetSettings() (dto.GeneralSettingsModel, error)
 		"popular_categories_text",
 		"related_products_text",
 		"blog_text",
+		"highlight_products",
+		"todays_product",
 	}
 
 	var settingsModel []dto.SettingsModel
@@ -61,9 +63,6 @@ func (s *SettingsRepositoryImpl) GetSettings() (dto.GeneralSettingsModel, error)
 	menus, err := s.getMenus(settingsMap)
 	footer1, err := s.getFooter1(settingsMap)
 	footer2, err := s.getFooter2(settingsMap)
-
-	// TODO menü child parent eklenecek
-	//menuTree, err := s.buildMenuTrees(menus)
 
 	generalSettings := dto.GeneralSettingsModel{Settings: settingsMap, Menu: menus, Footer1: footer1, Footer2: footer2}
 

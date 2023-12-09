@@ -8,6 +8,7 @@ import (
 type BlogRepository interface {
 	GetBlogsForHomePage() ([]model.BlogModel, error)
 	GetAllBlogs() ([]model.BlogModel, error)
+	GetAllBlogsByLimit(limit int) ([]model.BlogModel, error)
 	FindById(slug string) (model.BlogLongModel, error)
 }
 
@@ -31,6 +32,13 @@ func (b BlogRepositoryImpl) GetBlogsForHomePage() ([]model.BlogModel, error) {
 func (b BlogRepositoryImpl) GetAllBlogs() ([]model.BlogModel, error) {
 	var blogs []model.BlogModel
 	err := b.db.Table("blogs").Order("created_at desc").Find(&blogs).Error
+
+	return blogs, err
+}
+
+func (b BlogRepositoryImpl) GetAllBlogsByLimit(limit int) ([]model.BlogModel, error) {
+	var blogs []model.BlogModel
+	err := b.db.Table("blogs").Order("created_at desc").Limit(limit).Find(&blogs).Error
 
 	return blogs, err
 }

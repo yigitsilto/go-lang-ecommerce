@@ -17,6 +17,17 @@ func NewBlogController(service services.BlogService) *BlogController {
 	}
 }
 
+func (b *BlogController) GetAllBlogsByLimit(c *gin.Context) {
+	brands, err := b.blogService.GetAllBlogsByLimit()
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"data": exceptions.ServerError.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"data": brands})
+}
+
 func (b *BlogController) GetAllBlogs(c *gin.Context) {
 	brands, err := b.blogService.GetAllBlogs()
 

@@ -55,9 +55,33 @@ func RegisterRoutes(router *gin.Engine) {
 	authService := services.NewAuthService(userRepository)
 	authController := controllers.NewAuthController(authService)
 
+	// slider DI
+	sliderService := services.NewSliderService(sliderRepository, redisClient)
+	sliderController := controllers.NewSliderController(sliderService)
+
+	// popular products DI
+	popularProductService := services.NewPopularProductService(
+		popularProductsRepository, productRepository, redisClient,
+	)
+	popularProductController := controllers.NewPopularProductController(popularProductService)
+
+	// popular categories DI
+	popularCategoriesService := services.NewPopularCategoriesService(popularProductsRepository, redisClient)
+	popularCategoriesController := controllers.NewPopularCategoryController(popularCategoriesService)
+
+	// TODO home page yeni temaya geçilince kaldırılacak
 	// Register the routers for brands.
 	router.GET("/api/brands", brandController.GetAllBrands)
 	router.GET("/api/brands/:id", brandController.FindById)
+
+	// Register the routers for sliders
+	router.GET("/api/sliders", sliderController.GetSlider)
+
+	// Register the routers for popular products
+	router.GET("/api/popular-products", popularProductController.GetPopularProducts)
+
+	// Register the routers for popular categories
+	router.GET("/api/popular-categories", popularCategoriesController.GetPopularCategories)
 
 	// Register the routers for products.
 	router.GET("/api/productsByBrand/:slug", productController.GetProductsByBrand)
@@ -76,6 +100,7 @@ func RegisterRoutes(router *gin.Engine) {
 
 	// blogs
 	router.GET("/api/blogs", blogController.GetAllBlogs)
+	router.GET("/api/home/blogs", blogController.GetAllBlogsByLimit)
 	router.GET("/api/blogs/:slug", blogController.FindById)
 
 	// auth
