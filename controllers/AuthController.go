@@ -3,7 +3,7 @@ package controllers
 import (
 	"ecommerce/exceptions"
 	"ecommerce/services"
-	"github.com/gin-gonic/gin"
+	"github.com/gofiber/fiber/v2"
 	"net/http"
 )
 
@@ -17,13 +17,12 @@ func NewAuthController(service services.AuthService) *AuthController {
 	}
 }
 
-func (h *AuthController) GetMe(c *gin.Context) {
+func (h *AuthController) GetMe(c *fiber.Ctx) error {
 	user, err := h.authService.GetMe(c)
 
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"data": exceptions.ServerError.Error()})
-		return
+		return c.Status(http.StatusInternalServerError).JSON(fiber.Map{"data": exceptions.ServerError.Error()})
 	}
 
-	c.JSON(http.StatusOK, gin.H{"user": user})
+	return c.Status(http.StatusOK).JSON(fiber.Map{"user": user})
 }

@@ -3,7 +3,7 @@ package controllers
 import (
 	"ecommerce/exceptions"
 	"ecommerce/services"
-	"github.com/gin-gonic/gin"
+	"github.com/gofiber/fiber/v2"
 	"net/http"
 )
 
@@ -19,27 +19,22 @@ func NewBrandController(
 	}
 }
 
-func (h *BrandController) GetAllBrands(c *gin.Context) {
-
+func (h *BrandController) GetAllBrands(c *fiber.Ctx) error {
 	brands, err := h.brandService.GetAllBrands()
 
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"data": exceptions.ServerError.Error()})
-		return
+		return c.Status(http.StatusNotFound).JSON(fiber.Map{"data": exceptions.ServerError.Error()})
 	}
 
-	c.JSON(http.StatusOK, gin.H{"data": brands})
+	return c.Status(http.StatusOK).JSON(fiber.Map{"data": brands})
 }
 
-func (h *BrandController) FindById(c *gin.Context) {
-
-	b, err := h.brandService.FindBrandById(c.Param("id"))
+func (h *BrandController) FindById(c *fiber.Ctx) error {
+	b, err := h.brandService.FindBrandById(c.Params("id"))
 
 	if err != nil || b.Slug == "" {
-		c.JSON(http.StatusNotFound, gin.H{"data": exceptions.EntityNotFoundException.Error()})
-		return
+		return c.Status(http.StatusNotFound).JSON(fiber.Map{"data": exceptions.EntityNotFoundException.Error()})
 	}
 
-	c.JSON(http.StatusOK, gin.H{"data": b})
-
+	return c.Status(http.StatusOK).JSON(fiber.Map{"data": b})
 }

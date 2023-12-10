@@ -3,7 +3,7 @@ package controllers
 import (
 	"ecommerce/exceptions"
 	"ecommerce/services"
-	"github.com/gin-gonic/gin"
+	"github.com/gofiber/fiber/v2"
 	"net/http"
 )
 
@@ -17,37 +17,33 @@ func NewBlogController(service services.BlogService) *BlogController {
 	}
 }
 
-func (b *BlogController) GetAllBlogsByLimit(c *gin.Context) {
+func (b *BlogController) GetAllBlogsByLimit(c *fiber.Ctx) error {
 	brands, err := b.blogService.GetAllBlogsByLimit()
 
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"data": exceptions.ServerError.Error()})
-		return
+		return c.Status(http.StatusInternalServerError).JSON(fiber.Map{"data": exceptions.ServerError.Error()})
 	}
 
-	c.JSON(http.StatusOK, gin.H{"data": brands})
+	return c.Status(http.StatusOK).JSON(fiber.Map{"data": brands})
 }
 
-func (b *BlogController) GetAllBlogs(c *gin.Context) {
+func (b *BlogController) GetAllBlogs(c *fiber.Ctx) error {
 	brands, err := b.blogService.GetAllBlogs()
 
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"data": exceptions.ServerError.Error()})
-		return
+		return c.Status(http.StatusInternalServerError).JSON(fiber.Map{"data": exceptions.ServerError.Error()})
 	}
 
-	c.JSON(http.StatusOK, gin.H{"data": brands})
+	return c.Status(http.StatusOK).JSON(fiber.Map{"data": brands})
 }
 
-func (h *BlogController) FindById(c *gin.Context) {
+func (h *BlogController) FindById(c *fiber.Ctx) error {
 
-	b, err := h.blogService.FindById(c.Param("slug"))
+	b, err := h.blogService.FindById(c.Params("slug"))
 
 	if err != nil || b.Slug == "" {
-		c.JSON(http.StatusNotFound, gin.H{"data": exceptions.EntityNotFoundException.Error()})
-		return
+		return c.Status(http.StatusNotFound).JSON(fiber.Map{"data": exceptions.EntityNotFoundException.Error()})
 	}
 
-	c.JSON(http.StatusOK, gin.H{"data": b})
-
+	return c.Status(http.StatusOK).JSON(fiber.Map{"data": b})
 }

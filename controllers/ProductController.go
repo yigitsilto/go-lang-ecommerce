@@ -4,7 +4,7 @@ import (
 	model "ecommerce/dto"
 	"ecommerce/exceptions"
 	"ecommerce/services"
-	"github.com/gin-gonic/gin"
+	"github.com/gofiber/fiber/v2"
 	"net/http"
 	"strconv"
 )
@@ -17,82 +17,72 @@ func NewProductController(productService services.ProductService) *ProductContro
 	return &ProductController{productService: productService}
 }
 
-func (p *ProductController) GetProductsByBrand(c *gin.Context) {
-
+func (p *ProductController) GetProductsByBrand(c *fiber.Ctx) error {
 	page, err := strconv.Atoi(c.Query("page"))
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Page parameter must be an integer"})
-		return
+		return c.Status(http.StatusBadRequest).JSON(fiber.Map{"error": "Page parameter must be an integer"})
 	}
-	user, _ := c.Get("user")
+
+	user := c.Locals("user")
 	authUser := model.User{}
 	if user != nil {
 		authUser = user.(model.User)
 	}
 
-	products, err := p.productService.GetProductsByBrand(c.Param("slug"), page, c.Query("order"), &authUser)
+	products, err := p.productService.GetProductsByBrand(c.Params("slug"), page, c.Query("order"), &authUser)
 
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"data": exceptions.ServerError.Error()})
-		return
-
+		return c.Status(http.StatusNotFound).JSON(fiber.Map{"data": exceptions.ServerError.Error()})
 	}
 
-	c.JSON(http.StatusOK, gin.H{"data": products})
+	return c.Status(http.StatusOK).JSON(fiber.Map{"data": products})
 }
 
-func (p *ProductController) FindProductBySlug(c *gin.Context) {
-
-	user, _ := c.Get("user")
+func (p *ProductController) FindProductBySlug(c *fiber.Ctx) error {
+	user := c.Locals("user")
 	authUser := model.User{}
 	if user != nil {
 		authUser = user.(model.User)
 	}
 
-	product, err := p.productService.FindProductBySlug(c.Param("slug"), &authUser)
+	product, err := p.productService.FindProductBySlug(c.Params("slug"), &authUser)
 
 	if err != nil || product.Slug == "" {
-		c.JSON(http.StatusNotFound, gin.H{"data": exceptions.EntityNotFoundException.Error()})
-		return
+		return c.Status(http.StatusNotFound).JSON(fiber.Map{"data": exceptions.EntityNotFoundException.Error()})
 	}
 
-	c.JSON(http.StatusOK, gin.H{"data": product})
-
+	return c.Status(http.StatusOK).JSON(fiber.Map{"data": product})
 }
 
-func (p *ProductController) FindByCategorySlug(c *gin.Context) {
+func (p *ProductController) FindByCategorySlug(c *fiber.Ctx) error {
 	page, err := strconv.Atoi(c.Query("page"))
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Page parameter must be an integer"})
-		return
+		return c.Status(http.StatusBadRequest).JSON(fiber.Map{"error": "Page parameter must be an integer"})
 	}
-	user, _ := c.Get("user")
+
+	user := c.Locals("user")
 	authUser := model.User{}
 	if user != nil {
 		authUser = user.(model.User)
 	}
 
 	products, err := p.productService.GetProductsByCategorySlug(
-		c.Param("slug"), page, c.Query("filterBy"), c.Query("order"), &authUser,
+		c.Params("slug"), page, c.Query("filterBy"), c.Query("order"), &authUser,
 	)
 
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"data": exceptions.ServerError.Error()})
-		return
-
+		return c.Status(http.StatusNotFound).JSON(fiber.Map{"data": exceptions.ServerError.Error()})
 	}
 
-	c.JSON(http.StatusOK, gin.H{"data": products})
+	return c.Status(http.StatusOK).JSON(fiber.Map{"data": products})
 }
 
-func (p *ProductController) FindFiltersForProducts(c *gin.Context) {
-
+func (p *ProductController) FindFiltersForProducts(c *fiber.Ctx) error {
 	filters, err := p.productService.FindFiltersForProduct(c.Query("categorySlug"), c.Query("filterId"))
 
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"data": exceptions.ServerError.Error()})
-		return
-
+		return c.Status(http.StatusNotFound).JSON(fiber.Map{"data": exceptions.ServerError.Error()})
 	}
-	c.JSON(http.StatusOK, gin.H{"data": filters})
+
+	return c.Status(http.StatusOK).JSON(fiber.Map{"data": filters})
 }

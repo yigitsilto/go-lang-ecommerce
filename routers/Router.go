@@ -7,10 +7,10 @@ import (
 	"ecommerce/database"
 	"ecommerce/services"
 	"ecommerce/utils"
-	"github.com/gin-gonic/gin"
+	"github.com/gofiber/fiber/v2"
 )
 
-func RegisterRoutes(router *gin.Engine) {
+func RegisterRoutes(router *fiber.App) {
 	db := database.Database
 	redisClient := config.NewRedisClient()
 	productUtil := utils.ProductUtilImpl{}
@@ -76,44 +76,44 @@ func RegisterRoutes(router *gin.Engine) {
 
 	// TODO home page yeni temaya geçilince kaldırılacak
 	// Register the routers for brands.
-	router.GET("/api/brands", brandController.GetAllBrands)
-	router.GET("/api/brands/:id", brandController.FindById)
+	router.Get("/api/brands", brandController.GetAllBrands)
+	router.Get("/api/brands/:id", brandController.FindById)
 
 	// Register the routers for banners.
-	router.GET("/api/banners", bannerController.GetAllBanners)
+	router.Get("/api/banners", bannerController.GetAllBanners)
 
 	// Register the routers for sliders
-	router.GET("/api/sliders", sliderController.GetSlider)
+	router.Get("/api/sliders", sliderController.GetSlider)
 
 	// Register the routers for popular products
-	router.GET("/api/popular-products", popularProductController.GetPopularProducts)
-	router.GET("/api/highlights-products", popularProductController.GetHighlightsProducts)
-	router.GET("/api/daily-products", popularProductController.GetDailyPopularProducts)
+	router.Get("/api/popular-products", popularProductController.GetPopularProducts)
+	router.Get("/api/highlights-products", popularProductController.GetHighlightsProducts)
+	router.Get("/api/daily-products", popularProductController.GetDailyPopularProducts)
 
 	// Register the routers for popular categories
-	router.GET("/api/popular-categories", popularCategoriesController.GetPopularCategories)
+	router.Get("/api/popular-categories", popularCategoriesController.GetPopularCategories)
 
 	// Register the routers for products.
-	router.GET("/api/productsByBrand/:slug", productController.GetProductsByBrand)
-	router.GET("/api/productsByCategory/:slug", productController.FindByCategorySlug)
-	router.GET("/api/products/:slug", productController.FindProductBySlug)
-	router.GET("/api/getFiltersForProduct", productController.FindFiltersForProducts)
+	router.Get("/api/productsByBrand/:slug", productController.GetProductsByBrand)
+	router.Get("/api/productsByCategory/:slug", productController.FindByCategorySlug)
+	router.Get("/api/products/:slug", productController.FindProductBySlug)
+	router.Get("/api/getFiltersForProduct", productController.FindFiltersForProducts)
 
 	// Register the routers for homePage
-	router.GET("/api/homePage", homePageController.GetHomePage)
+	router.Get("/api/homePage", homePageController.GetHomePage)
 
 	// related products
-	router.GET("/api/relatedProducts", relatedProductController.FindAllRelatedProducts)
+	router.Get("/api/relatedProducts", relatedProductController.FindAllRelatedProducts)
 
 	// settings
-	router.GET("/api/settings", settingsController.GetSettings)
+	router.Get("/api/settings", settingsController.GetSettings)
 
 	// blogs
-	router.GET("/api/blogs", blogController.GetAllBlogs)
-	router.GET("/api/home/blogs", blogController.GetAllBlogsByLimit)
-	router.GET("/api/blogs/:slug", blogController.FindById)
+	router.Get("/api/blogs", blogController.GetAllBlogs)
+	router.Get("/api/home/blogs", blogController.GetAllBlogsByLimit)
+	router.Get("/api/blogs/:slug", blogController.FindById)
 
 	// auth
-	router.GET("/api/auth/me", authController.GetMe)
+	router.Get("/api/auth/me", authController.GetMe)
 
 }

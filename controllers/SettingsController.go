@@ -3,7 +3,7 @@ package controllers
 import (
 	"ecommerce/exceptions"
 	"ecommerce/services"
-	"github.com/gin-gonic/gin"
+	"github.com/gofiber/fiber/v2"
 	"net/http"
 )
 
@@ -19,14 +19,13 @@ func NewSettingController(
 	}
 }
 
-func (h *SettingController) GetSettings(c *gin.Context) {
+func (h *SettingController) GetSettings(c *fiber.Ctx) error {
 
 	settings, err := h.service.GetSettings()
 
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"data": exceptions.ServerError.Error()})
-		return
+		return c.Status(http.StatusNotFound).JSON(fiber.Map{"data": exceptions.ServerError.Error()})
 	}
 
-	c.JSON(http.StatusOK, gin.H{"data": settings})
+	return c.Status(http.StatusOK).JSON(fiber.Map{"data": settings})
 }

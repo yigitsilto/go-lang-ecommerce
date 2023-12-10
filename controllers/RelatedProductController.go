@@ -4,7 +4,7 @@ import (
 	model "ecommerce/dto"
 	"ecommerce/exceptions"
 	"ecommerce/services"
-	"github.com/gin-gonic/gin"
+	"github.com/gofiber/fiber/v2"
 	"net/http"
 )
 
@@ -20,13 +20,12 @@ func NewRelatedProductController(
 	}
 }
 
-func (r *RelatedProductController) FindAllRelatedProducts(c *gin.Context) {
-
+func (r *RelatedProductController) FindAllRelatedProducts(c *fiber.Ctx) error {
 	if c.Query("productId") == "" {
-		c.JSON(http.StatusBadRequest, gin.H{"data": exceptions.BadRequest.Error()})
-		return
+		return c.Status(http.StatusBadRequest).JSON(fiber.Map{"data": exceptions.BadRequest.Error()})
 	}
-	user, _ := c.Get("user")
+
+	user := c.Locals("user")
 	authUser := model.User{}
 	if user != nil {
 		authUser = user.(model.User)
@@ -35,10 +34,8 @@ func (r *RelatedProductController) FindAllRelatedProducts(c *gin.Context) {
 	products, err := r.service.FindAllRelatedProducts(&authUser, c.Query("productId"))
 
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"data": exceptions.ServerError.Error()})
-		return
-
+		return c.Status(http.StatusNotFound).JSON(fiber.Map{"data": exceptions.ServerError.Error()})
 	}
 
-	c.JSON(http.StatusOK, gin.H{"data": products})
+	return c.Status(http.StatusOK).JSON(fiber.Map{"data": products})
 }

@@ -3,11 +3,11 @@ package services
 import (
 	"ecommerce/Repositories"
 	"ecommerce/dto"
-	"github.com/gin-gonic/gin"
+	"github.com/gofiber/fiber/v2"
 )
 
 type AuthService interface {
-	GetMe(c *gin.Context) (dto.UserMeModel, error)
+	GetMe(c *fiber.Ctx) (dto.UserMeModel, error)
 }
 
 type AuthServiceImpl struct {
@@ -20,8 +20,8 @@ func NewAuthService(repository Repositories.UserRepository) AuthService {
 	}
 }
 
-func (h *AuthServiceImpl) GetMe(c *gin.Context) (dto.UserMeModel, error) {
-	user, _ := c.Get("user")
+func (h *AuthServiceImpl) GetMe(c *fiber.Ctx) (dto.UserMeModel, error) {
+	user := c.Locals("user")
 	authUser := dto.User{}
 	if user != nil {
 		authUser = user.(dto.User)

@@ -1,18 +1,18 @@
 package middleware
 
 import (
-	model "ecommerce/dto"
+	"ecommerce/dto"
 	"github.com/dgrijalva/jwt-go"
-	"github.com/gin-gonic/gin"
+	"github.com/gofiber/fiber/v2"
 	"net/http"
 	"os"
 	"strings"
 )
 
-func AuthMiddleware(c *gin.Context) {
-	c.Set("auth", false)
+func AuthMiddleware(c *fiber.Ctx) error {
+	c.Locals("auth", false)
 	// Authorization başlığını al
-	authHeader := c.GetHeader("Authorization")
+	authHeader := c.Get("Authorization")
 	// Tokeni al
 	tokenString := strings.TrimPrefix(authHeader, "Bearer ")
 
@@ -28,8 +28,7 @@ func AuthMiddleware(c *gin.Context) {
 		)
 
 		if err != nil || !token.Valid {
-			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Geçersiz token"})
-			return
+			return c.Status(http.StatusUnauthorized).JSON(fiber.Map{"error": "Geçersiz token"})
 		}
 
 		// Token doğrulandı, kullanıcı bilgisine erişebilirsiniz
@@ -39,13 +38,13 @@ func AuthMiddleware(c *gin.Context) {
 		group := claims["group"].(float64)
 		email := claims["email"].(string)
 
-		user := model.User{Group: group, Email: email}
-		c.Set("user", user)
+		user := dto.User{Group: group, Email: email}
+		c.Locals("user", user)
 
 	} else {
-		user := model.User{Group: 0, Email: ""}
-		c.Set("User", user)
+		user := dto.User{Group: 0, Email: ""}
+		c.Locals("user", user)
 	}
 
-	c.Next()
+	return c.Next()
 }

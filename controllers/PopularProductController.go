@@ -4,7 +4,7 @@ import (
 	model "ecommerce/dto"
 	"ecommerce/exceptions"
 	"ecommerce/services"
-	"github.com/gin-gonic/gin"
+	"github.com/gofiber/fiber/v2"
 	"net/http"
 )
 
@@ -18,8 +18,8 @@ func NewPopularProductController(service services.PopularProductService) *Popula
 	}
 }
 
-func (h *PopularProductController) GetPopularProducts(c *gin.Context) {
-	user, _ := c.Get("user")
+func (h *PopularProductController) GetPopularProducts(c *fiber.Ctx) error {
+	user := c.Locals("user")
 	authUser := model.User{}
 	if user != nil {
 		authUser = user.(model.User)
@@ -28,16 +28,14 @@ func (h *PopularProductController) GetPopularProducts(c *gin.Context) {
 	products, err := h.popularProductService.GetPopularProducts(&authUser)
 
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"data": exceptions.ServerError.Error()})
-		return
-
+		return c.Status(http.StatusNotFound).JSON(fiber.Map{"data": exceptions.ServerError.Error()})
 	}
 
-	c.JSON(http.StatusOK, gin.H{"data": products})
+	return c.Status(http.StatusOK).JSON(fiber.Map{"data": products})
 }
 
-func (h *PopularProductController) GetHighlightsProducts(c *gin.Context) {
-	user, _ := c.Get("user")
+func (h *PopularProductController) GetHighlightsProducts(c *fiber.Ctx) error {
+	user := c.Locals("user")
 	authUser := model.User{}
 	if user != nil {
 		authUser = user.(model.User)
@@ -46,16 +44,14 @@ func (h *PopularProductController) GetHighlightsProducts(c *gin.Context) {
 	products, err := h.popularProductService.GetHighlightsProducts(&authUser)
 
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"data": exceptions.ServerError.Error()})
-		return
-
+		return c.Status(http.StatusNotFound).JSON(fiber.Map{"data": exceptions.ServerError.Error()})
 	}
 
-	c.JSON(http.StatusOK, gin.H{"data": products})
+	return c.Status(http.StatusOK).JSON(fiber.Map{"data": products})
 }
 
-func (h *PopularProductController) GetDailyPopularProducts(c *gin.Context) {
-	user, _ := c.Get("user")
+func (h *PopularProductController) GetDailyPopularProducts(c *fiber.Ctx) error {
+	user := c.Locals("user")
 	authUser := model.User{}
 	if user != nil {
 		authUser = user.(model.User)
@@ -64,10 +60,8 @@ func (h *PopularProductController) GetDailyPopularProducts(c *gin.Context) {
 	products, err := h.popularProductService.GetDailyPopularProducts(&authUser)
 
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"data": exceptions.ServerError.Error()})
-		return
-
+		return c.Status(http.StatusNotFound).JSON(fiber.Map{"data": exceptions.ServerError.Error()})
 	}
 
-	c.JSON(http.StatusOK, gin.H{"data": products})
+	return c.Status(http.StatusOK).JSON(fiber.Map{"data": products})
 }

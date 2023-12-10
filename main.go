@@ -4,27 +4,26 @@ import (
 	"ecommerce/database"
 	"ecommerce/middleware"
 	routes "ecommerce/routers"
-	"github.com/gin-gonic/gin"
+	"github.com/gofiber/fiber/v2"
 	"github.com/joho/godotenv"
 	"log"
 )
 
-func CORSMiddleware() gin.HandlerFunc {
-	return func(c *gin.Context) {
-		c.Writer.Header().Set("Access-Control-Allow-Origin", "*")
-		c.Writer.Header().Set("Access-Control-Allow-Credentials", "true")
-		c.Writer.Header().Set(
+func CORSMiddleware() fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		c.Set("Access-Control-Allow-Origin", "*")
+		c.Set("Access-Control-Allow-Credentials", "true")
+		c.Set(
 			"Access-Control-Allow-Headers",
 			"Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization, accept, origin, Cache-Control, X-Requested-With",
 		)
-		c.Writer.Header().Set("Access-Control-Allow-Methods", "POST, OPTIONS, GET, PUT")
+		c.Set("Access-Control-Allow-Methods", "POST, OPTIONS, GET, PUT")
 
-		if c.Request.Method == "OPTIONS" {
-			c.AbortWithStatus(204)
-			return
+		if c.Method() == "OPTIONS" {
+			return c.SendStatus(204)
 		}
 
-		c.Next()
+		return c.Next()
 	}
 }
 
@@ -32,14 +31,15 @@ func main() {
 	loadEnv()
 	loadDatabase()
 
-	r := gin.Default()
+	app := fiber.New()
 
-	r.Use(CORSMiddleware())
-	r.Use(middleware.AuthMiddleware)
+	app.Use(CORSMiddleware())
+	app.Use(middleware.AuthMiddleware)
 
-	routes.RegisterRoutes(r)
+	routes.RegisterRoutes(app)
 
-	r.RunTLS(":8443", "./cert.cert", "key.key")
+	app.ListenTLS(":8443", "./cert.cert", "key.key")
+	//log.Fatal(app.Listen(":8443"))
 }
 
 func loadDatabase() {

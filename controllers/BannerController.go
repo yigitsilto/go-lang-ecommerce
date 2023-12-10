@@ -3,7 +3,7 @@ package controllers
 import (
 	"ecommerce/exceptions"
 	"ecommerce/services"
-	"github.com/gin-gonic/gin"
+	"github.com/gofiber/fiber/v2"
 	"net/http"
 )
 
@@ -19,14 +19,12 @@ func NewBannerController(
 	}
 }
 
-func (h *BannerController) GetAllBanners(c *gin.Context) {
-
-	brands, err := h.bannerService.GetBanners()
+func (h *BannerController) GetAllBanners(c *fiber.Ctx) error {
+	banners, err := h.bannerService.GetBanners()
 
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"data": exceptions.ServerError.Error()})
-		return
+		return c.Status(http.StatusNotFound).JSON(fiber.Map{"data": exceptions.ServerError.Error()})
 	}
 
-	c.JSON(http.StatusOK, gin.H{"data": brands})
+	return c.Status(http.StatusOK).JSON(fiber.Map{"data": banners})
 }
