@@ -9,7 +9,7 @@ import (
 type PopularProductService interface {
 	GetPopularProducts(user *dto.User) ([]dto.Product, error)
 	GetHighlightsProducts(user *dto.User) ([]dto.Product, error)
-	GetDailyPopularProducts(user *dto.User) ([]dto.Product, error)
+	GetDailyPopularProducts(user *dto.User) (dto.DailyProducts, error)
 }
 
 type PopularProductServiceImpl struct {
@@ -64,19 +64,19 @@ func (h *PopularProductServiceImpl) GetHighlightsProducts(user *dto.User) ([]dto
 	return popularProducts, nil
 }
 
-func (h *PopularProductServiceImpl) GetDailyPopularProducts(user *dto.User) ([]dto.Product, error) {
-	var popularProducts []dto.Product
+func (h *PopularProductServiceImpl) GetDailyPopularProducts(user *dto.User) (dto.DailyProducts, error) {
+	var dailyProductModel dto.DailyProducts
 
 	userInformation, err := h.productRepository.GetUsersCompanyGroup(user)
 
 	if err != nil {
-		return nil, err
+		return dailyProductModel, err
 	}
 
-	popularProducts, err = h.popularProductRepository.GetAllDailyPopularProducts(userInformation)
+	dailyProductModel, err = h.popularProductRepository.GetAllDailyPopularProducts(userInformation)
 	if err != nil {
-		return nil, err
+		return dailyProductModel, err
 	}
 
-	return popularProducts, nil
+	return dailyProductModel, nil
 }

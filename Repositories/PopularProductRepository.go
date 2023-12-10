@@ -10,7 +10,7 @@ type PopularProductRepository interface {
 	GetAllRelatedProducts(companyGroupId float64) ([]model.Product, error)
 	GetAllPopularCategories() ([]model.PopularCategoryModel, error)
 	GetAllHiglightsProducts(companyGroupId float64) ([]model.Product, error)
-	GetAllDailyPopularProducts(companyGroupId float64) ([]model.Product, error)
+	GetAllDailyPopularProducts(companyGroupId float64) (model.DailyProducts, error)
 }
 
 type PopularProductRepositoryImpl struct {
@@ -123,10 +123,11 @@ func (pp *PopularProductRepositoryImpl) GetAllHiglightsProducts(companyGroupId f
 }
 
 func (pp *PopularProductRepositoryImpl) GetAllDailyPopularProducts(companyGroupId float64) (
-	[]model.Product, error,
+	model.DailyProducts, error,
 ) {
 
 	popularProducts := []model.Product{}
+	var detail model.DailyProductsInformation
 
 	groupCompanyIdInt := int(companyGroupId)
 
@@ -168,7 +169,16 @@ func (pp *PopularProductRepositoryImpl) GetAllDailyPopularProducts(companyGroupI
 
 	pp.productUtil.BuildProducts(popularProducts, groupCompanyIdInt)
 
-	return popularProducts, err
+	if len(popularProducts) > 0 {
+		err = pp.db.Table("entity_files").
+			Select("(select fs.path from entity_files efs INNER JOIN files fs ON fs.id = efs.file_id WHERE efs.entity_type = 'FleetCart\\\\TodaysPopularProduct' ORDER BY efs.created_at LIMIT 1) as image_path ").Limit(1).Find(&detail).Error
+
+		detail.ImagePath = pp.productUtil.BuildImagePaths(detail.ImagePath)
+	}
+
+	returnModel := model.DailyProducts{Products: popularProducts, Detail: detail}
+
+	return returnModel, err
 
 }
 
