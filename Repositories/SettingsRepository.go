@@ -45,6 +45,18 @@ func (s *SettingsRepositoryImpl) GetSettings() (dto.GeneralSettingsModel, error)
 		"blog_text",
 		"highlight_products",
 		"todays_product",
+		"slider_status",
+		"daily_products_status",
+		"hightlights_status",
+		"banner_status",
+		"brands_status",
+		"blogs_status",
+		"slider_order",
+		"daily_products_order",
+		"hightlights_order",
+		"banner_order",
+		"brands_order",
+		"blogs_order",
 	}
 
 	var settingsModel []dto.SettingsModel
