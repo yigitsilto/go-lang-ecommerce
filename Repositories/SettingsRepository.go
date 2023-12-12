@@ -22,6 +22,8 @@ func (s *SettingsRepositoryImpl) GetSettings() (dto.GeneralSettingsModel, error)
 	settingsKey := [...]string{
 		"storefront_copyright_text",
 		"storefront_welcome_text",
+		"welcome_text2",
+		"welcome_text3",
 		"storefront_header_logo",
 		"storefront_slider_banner_1_file_id",
 		"storefront_slider_banner_2_file_id",
