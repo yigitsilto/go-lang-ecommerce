@@ -74,6 +74,11 @@ func RegisterRoutes(router *fiber.App) {
 	bannerService := services.NewBannerService(bannerRepository, redisClient)
 	bannerController := controllers.NewBannerController(bannerService)
 
+	// gallery DI
+	galleryRepository := Repositories.NewGalleryRepository(db)
+	galleryService := services.NewGalleryService(galleryRepository, redisClient)
+	galleryController := controllers.NewGalleryController(galleryService)
+
 	// TODO home page yeni temaya geçilince kaldırılacak
 	// Register the routers for brands.
 	router.Get("/api/brands", brandController.GetAllBrands)
@@ -81,6 +86,9 @@ func RegisterRoutes(router *fiber.App) {
 
 	// Register the routers for banners.
 	router.Get("/api/banners", bannerController.GetAllBanners)
+
+	// Register the routers for gallery.
+	router.Get("/api/galleries", galleryController.GetAllGalleries)
 
 	// Register the routers for sliders
 	router.Get("/api/sliders", sliderController.GetSlider)
