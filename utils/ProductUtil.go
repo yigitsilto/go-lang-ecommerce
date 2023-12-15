@@ -30,7 +30,9 @@ func (pu *ProductUtilImpl) BuildProducts(products []dto.Product, companyId int) 
 		}
 
 		products[index].Path = os.Getenv("IMAGE_APP_URL") + product.Path
-		products[index].SecondImage = os.Getenv("IMAGE_APP_URL") + product.SecondImage
+		if product.SecondImage != "" {
+			products[index].SecondImage = os.Getenv("IMAGE_APP_URL") + product.SecondImage
+		}
 	}
 }
 
@@ -70,7 +72,9 @@ func (pu *ProductUtilImpl) BuildOrderByValues(orderBy *string) string {
 }
 
 func (pu *ProductUtilImpl) BuildImagePaths(imagePath string) string {
-
-	return os.Getenv("IMAGE_APP_URL") + imagePath
-
+	if imagePath != "" {
+		return os.Getenv("IMAGE_APP_URL") + imagePath
+	} else {
+		return ""
+	}
 }
