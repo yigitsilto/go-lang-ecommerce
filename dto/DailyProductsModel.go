@@ -7,4 +7,5 @@ type DailyProducts struct {
 
 type DailyProductsInformation struct {
 	ImagePath string `json:"image_path"`
+	VideoUrl  string `json:"video_url"`
 }
