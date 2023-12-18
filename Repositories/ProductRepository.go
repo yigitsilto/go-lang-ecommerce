@@ -92,7 +92,7 @@ func (p *ProductRepositoryImpl) FindPageableProductsByBrandSlug(
 		page = 1
 	}
 
-	perPage := 12
+	perPage := 50
 	offset := (page - 1) * perPage
 
 	var products []dto.Product
