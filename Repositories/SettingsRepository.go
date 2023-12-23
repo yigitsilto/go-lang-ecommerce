@@ -63,6 +63,12 @@ func (s *SettingsRepositoryImpl) GetSettings() (dto.GeneralSettingsModel, error)
 		"brands_order",
 		"blogs_order",
 		"popular_products_order",
+		"popup_title",
+		"popup_link_url",
+		"popup_buton_text",
+		"popup_base_image",
+		"popup_status",
+		"popup_description",
 	}
 
 	var settingsModel []dto.SettingsModel
