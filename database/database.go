@@ -6,6 +6,7 @@ import (
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
 	"os"
+	"time"
 )
 
 var Database *gorm.DB
@@ -31,6 +32,24 @@ func Connect() {
 			PrepareStmt: true,
 		},
 	)
+
+	// Set connection pool settings
+	sqlDB, err := Database.DB()
+	if err != nil {
+		panic(err)
+	}
+
+	// SetMaxIdleConns sets the maximum number of connections in the idle connection pool.
+	sqlDB.SetMaxIdleConns(10)
+
+	// SetMaxOpenConns sets the maximum number of open connections to the database.
+	sqlDB.SetMaxOpenConns(100)
+
+	// SetConnMaxLifetime sets the maximum amount of time a connection may be reused.
+	sqlDB.SetConnMaxLifetime(time.Hour)
+
+	stats := sqlDB.Stats()
+	fmt.Printf("Open Connections: %d\n", stats.OpenConnections)
 
 	if err != nil {
 		panic(err)
