@@ -10,4 +10,5 @@ type UserMeModel struct {
 	VergiNo        string  `json:"vergi_no"`
 	Email          string  `json:"email"`
 	CompanyGroupId float64 `json:"company_group_id"`
+	IsGuest        bool    `json:"is_guest"`
 }

@@ -69,6 +69,7 @@ func (s *SettingsRepositoryImpl) GetSettings() (dto.GeneralSettingsModel, error)
 		"popup_base_image",
 		"popup_status",
 		"popup_description",
+		"",
 	}
 
 	var settingsModel []dto.SettingsModel

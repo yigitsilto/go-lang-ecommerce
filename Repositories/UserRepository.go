@@ -6,7 +6,7 @@ import (
 )
 
 type UserRepository interface {
-	FindUserByEmail(email string) (model.UserMeModel, error)
+	FindUserByEmail(id float64) (model.UserMeModel, error)
 }
 
 type UserRepositoryImpl struct {
@@ -19,11 +19,11 @@ func NewUserRepository(db *gorm.DB) UserRepository {
 	}
 }
 
-func (u UserRepositoryImpl) FindUserByEmail(email string) (model.UserMeModel, error) {
+func (u UserRepositoryImpl) FindUserByEmail(id float64) (model.UserMeModel, error) {
 
 	var user model.UserMeModel
 
-	err := u.db.Table("users").Where("email =?", email).Find(&user).Error
+	err := u.db.Table("users").Where("id =?", int(id)).Find(&user).Error
 
 	return user, err
 

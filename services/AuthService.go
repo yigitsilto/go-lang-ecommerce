@@ -27,5 +27,5 @@ func (h *AuthServiceImpl) GetMe(c *fiber.Ctx) (dto.UserMeModel, error) {
 		authUser = user.(dto.User)
 	}
 
-	return h.userRepository.FindUserByEmail(authUser.Email)
+	return h.userRepository.FindUserByEmail(authUser.Id)
 }

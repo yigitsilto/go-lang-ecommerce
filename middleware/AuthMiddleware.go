@@ -37,12 +37,13 @@ func AuthMiddleware(c *fiber.Ctx) error {
 		//userID := claims["user_id"].(string)
 		group := claims["group"].(float64)
 		email := claims["email"].(string)
+		id := claims["id"].(float64)
 
-		user := dto.User{Group: group, Email: email}
+		user := dto.User{Group: group, Email: email, Id: id}
 		c.Locals("user", user)
 
 	} else {
-		user := dto.User{Group: 0, Email: ""}
+		user := dto.User{Group: 0, Email: "", Id: 0}
 		c.Locals("user", user)
 	}
 
