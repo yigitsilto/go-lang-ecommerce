@@ -12,6 +12,10 @@ type Product struct {
 	InStock               bool    `json:"in_stock"`
 	CompanyPriceId        int     `json:"company_price_id"`
 	Price                 float64 `gorm:"type:decimal(18,4) unsigned" json:"price"`
+	Price2                float64 `gorm:"type:decimal(18,4) unsigned" json:"price2"`
+	Price3                float64 `gorm:"type:decimal(18,4) unsigned" json:"price3"`
+	Price4                float64 `gorm:"type:decimal(18,4) unsigned" json:"price4"`
+	Price5                float64 `gorm:"type:decimal(18,4) unsigned" json:"price5"`
 	PriceFormatted        string  `json:"price_formatted"`
 	SpecialPrice          float64 `gorm:"type:decimal(18,4) unsigned" json:"special_price"`
 	SpecialPriceFormatted string  `json:"special_price_formatted"`

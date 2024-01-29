@@ -33,7 +33,7 @@ func (pp *PopularProductRepositoryImpl) GetAllRelatedProducts(companyGroupId flo
 	query := pp.db.Table("popular_products").
 		Select(
 			"products.id, products.slug, products.tax, products.product_order,  products.short_desc as short_description, products.price, products.special_price, products.qty, products.in_stock,"+
-				" brt.name AS brand_name, pt.name, "+
+				" brt.name AS brand_name, pt.name, products.price2 as price2, products.price3 as price3, products.price4 as price4, products.price5 as price5,  "+
 				" f.path AS path, products.is_active, popular_products.created_at, popular_products.updated_at",
 			" (select fs.path from entity_files efs INNER JOIN files fs ON fs.id = efs.file_id WHERE efs.entity_id = products.id and efs.zone != 'base_image' ORDER BY efs.created_at LIMIT 1) as second_image ",
 		).
@@ -45,22 +45,6 @@ func (pp *PopularProductRepositoryImpl) GetAllRelatedProducts(companyGroupId flo
 				"INNER JOIN brands br ON br.id = products.brand_id " +
 				"INNER JOIN brand_translations brt ON brt.brand_id = br.id  ",
 		)
-
-	if groupCompanyIdInt != 0 {
-
-		query = query.Select(
-			"products.id, products.slug, products.tax,  products.product_order, products.short_desc as short_description, pp.price as price, pp.company_price_id, products.special_price, products.qty, products.in_stock,"+
-				" brt.name AS brand_name, pt.name, "+
-				" f.path AS path, products.is_active, popular_products.created_at, popular_products.updated_at",
-			" (select fs.path from entity_files efs INNER JOIN files fs ON fs.id = efs.file_id WHERE efs.entity_id = products.id and efs.zone != 'base_image' ORDER BY efs.created_at LIMIT 1) as second_image ",
-		).
-			Joins(
-				"INNER JOIN "+
-					"( SELECT product_id, MAX(company_price_id) AS max_company_price_id FROM product_prices WHERE company_price_id <= ? AND price != 0  GROUP BY product_id"+
-					" ) max_pp ON max_pp.product_id = products.id  INNER JOIN product_prices pp ON pp.product_id = products.id AND pp.company_price_id = max_pp.max_company_price_id",
-				groupCompanyIdInt,
-			)
-	}
 
 	err := query.Where(
 		"products.is_active =?", true,

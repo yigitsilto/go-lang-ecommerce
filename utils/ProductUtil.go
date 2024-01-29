@@ -24,6 +24,12 @@ func (pu *ProductUtilImpl) BuildProducts(products []dto.Product, companyId int) 
 		if companyId > 1 {
 			products[index].SpecialPrice = 0
 			products[index].SpecialPriceFormatted = fmt.Sprintf("%.2f TRY", 0)
+
+			// arangement of price for companies
+			priceForCompany := pu.arrangeCompaniesPrices(products[index], companyId)
+			products[index].Price = priceForCompany
+			products[index].PriceFormatted = fmt.Sprintf("%.2f TRY", priceForCompany)
+
 		} else {
 			products[index].SpecialPrice = specialPrice
 			products[index].SpecialPriceFormatted = fmt.Sprintf("%.2f TRY", specialPrice)
@@ -33,6 +39,36 @@ func (pu *ProductUtilImpl) BuildProducts(products []dto.Product, companyId int) 
 		if product.SecondImage != "" {
 			products[index].SecondImage = os.Getenv("IMAGE_APP_URL") + product.SecondImage
 		}
+	}
+}
+func (pu *ProductUtilImpl) arrangeCompaniesPrices(product dto.Product, companyId int) float64 {
+	if companyId <= 1 {
+		return product.Price
+	}
+
+	switch companyId {
+	case 5:
+		if product.Price5 == 0 {
+			return pu.arrangeCompaniesPrices(product, companyId-1)
+		}
+		return product.Price5
+	case 4:
+		if product.Price4 == 0 {
+			return pu.arrangeCompaniesPrices(product, companyId-1)
+		}
+		return product.Price4
+	case 3:
+		if product.Price3 == 0 {
+			return pu.arrangeCompaniesPrices(product, companyId-1)
+		}
+		return product.Price3
+	case 2:
+		if product.Price2 == 0 {
+			return pu.arrangeCompaniesPrices(product, companyId-1)
+		}
+		return product.Price2
+	default:
+		return product.Price
 	}
 }
 
