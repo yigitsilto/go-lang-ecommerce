@@ -67,7 +67,7 @@ func (pu *ProductUtilImpl) BuildOrderByValues(orderBy *string) string {
 	case "orderByNameDesc":
 		return " pt.name desc"
 	default:
-		return " products.product_order asc"
+		return " CASE WHEN products.qty > 0 THEN 1 ELSE 2 END, products.product_order asc"
 	}
 }
 

@@ -64,7 +64,7 @@ func (pp *PopularProductRepositoryImpl) GetAllRelatedProducts(companyGroupId flo
 
 	err := query.Where(
 		"products.is_active =?", true,
-	).Order("popular_products.sort_order").Limit(20).Find(&popularProducts).Error
+	).Order(" CASE WHEN products.qty > 0 THEN 1 ELSE 2 END, popular_products.sort_order").Limit(20).Find(&popularProducts).Error
 
 	pp.productUtil.BuildProducts(popularProducts, groupCompanyIdInt)
 
@@ -114,7 +114,7 @@ func (pp *PopularProductRepositoryImpl) GetAllHiglightsProducts(companyGroupId f
 
 	err := query.Where(
 		"products.is_active =?", true,
-	).Order("highlights_products.sort_order").Limit(20).Find(&popularProducts).Error
+	).Order(" CASE WHEN products.qty > 0 THEN 1 ELSE 2 END, highlights_products.sort_order ASC").Limit(20).Find(&popularProducts).Error
 
 	pp.productUtil.BuildProducts(popularProducts, groupCompanyIdInt)
 
@@ -165,7 +165,7 @@ func (pp *PopularProductRepositoryImpl) GetAllDailyPopularProducts(companyGroupI
 
 	err := query.Where(
 		"products.is_active =?", true,
-	).Order("todays_popular_products.sort_order").Limit(20).Find(&popularProducts).Error
+	).Order(" CASE WHEN products.qty > 0 THEN 1 ELSE 2 END, todays_popular_products.sort_order").Limit(20).Find(&popularProducts).Error
 
 	pp.productUtil.BuildProducts(popularProducts, groupCompanyIdInt)
 
