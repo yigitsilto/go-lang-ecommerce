@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: go-ecommerce
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: go-ecommerce
+  template:
+    metadata:
+      labels:
+        app: go-ecommerce
+    spec:
+      containers:
+        - name: go-ecommerce-container
+          image: go-img
+          resources:
+            limits:
+              memory: "1Gi"
+              cpu: "1"
+          ports:
+            - containerPort: 3000
