@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: gocommerce-container
-          image: go-img
+          image: go-ecommerce-image
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 3001
