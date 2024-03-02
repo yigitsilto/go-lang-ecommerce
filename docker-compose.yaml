@@ -4,9 +4,12 @@ services:
   go:
     build:
       context: .
-      dockerfile: ./DockerFile
+      dockerfile: ./Dockerfile
     networks:
-      - ecommerce_backend-db  # Use the same network as MySQL
+      - db  # Yeni ağ adı
     ports:
       - "8443:8443"
 
+networks:
+  db:
+    external: true
