@@ -7,4 +7,10 @@ services:
       dockerfile: ./Dockerfile
     ports:
       - "8443:8443"
+    networks:
+      - external_network
 
+networks:
+  external_network:
+    external:
+      name: host
