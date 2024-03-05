@@ -5,11 +5,6 @@ services:
     build:
       context: .
       dockerfile: ./Dockerfile
-    networks:
-      - db  # Yeni ağ adı
     ports:
       - "8443:8443"
 
-networks:
-  db:
-    external: true
