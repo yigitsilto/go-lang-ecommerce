@@ -5,10 +5,22 @@ services:
     image: go
     build:
       context: .
-      dockerfile: ./Dockerfile
+      dockerfile: ./DockerFile
+    deploy:
+      replicas: 3
+    ports:
+      - "8443-8445:8443"
+
+  nginx:
+    image: nginx
+    ports:
+      - "8081:8081"
     deploy:
       replicas: 1
-    ports:
-      - "8443-8453:8443"
-    expose:
-      - "8443:8443"
+    configs:
+      - source: nginx_conf
+        target: /etc/nginx/nginx.conf
+
+configs:
+  nginx_conf:
+    file: ./nginx.conf

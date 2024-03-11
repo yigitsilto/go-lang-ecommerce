@@ -17,4 +17,4 @@ spec:
           image: go-ecommerce-image
           imagePullPolicy: IfNotPresent
           ports:
-            - containerPort: 3001
+            - containerPort: 8443
