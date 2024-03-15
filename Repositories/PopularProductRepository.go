@@ -171,7 +171,7 @@ func (pp *PopularProductRepositoryImpl) GetAllDailyPopularProducts(companyGroupI
 
 	if len(popularProducts) > 0 {
 		err = pp.db.Table("entity_files").
-			Select("(select fs.path from entity_files efs INNER JOIN files fs ON fs.id = efs.file_id WHERE efs.entity_type = 'FleetCart\\\\TodaysPopularProduct' ORDER BY efs.created_at LIMIT 1) as image_path ").Limit(1).Find(&detail).Error
+			Select("(select fs.path from entity_files efs INNER JOIN files fs ON fs.id = efs.file_id WHERE efs.entity_type = 'FleetCart\\\\TodaysPopularProduct' ORDER BY efs.created_at DESC LIMIT 1) as image_path ").Limit(1).Find(&detail).Error
 
 		detail.ImagePath = pp.productUtil.BuildImagePaths(detail.ImagePath)
 		detail.VideoUrl = popularProducts[0].VideoUrl

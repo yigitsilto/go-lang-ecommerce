@@ -27,7 +27,7 @@ func (b *BannerRepositoryImpl) GetBanners() ([]model.Banner, error) {
 	err := b.db.Table("banners").
 		Select("distinct banners.id, banners.created_at, banners.updated_at, banners.title, banners.description, banners.link_url, f.path AS image ").
 		Joins(
-			"LEFT JOIN entity_files ef ON ef.entity_type = 'FleetCart\\\\Banner' AND ef.entity_id = banners.id and ef.zone = 'base_image' " +
+			"LEFT JOIN entity_files ef ON ef.entity_type = 'FleetCart\\\\Banner' AND ef.entity_id = banners.id and ef.zone = 'base_image'  " +
 				"LEFT JOIN files f ON f.id = ef.file_id ",
 		).
 		Order("created_at desc").
