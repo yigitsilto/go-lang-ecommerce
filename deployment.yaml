@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: gocommerce-deployment
 spec:
-  replicas: 3
+  replicas: 1
   selector:
     matchLabels:
       app: gocommerce
@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: gocommerce-container
-          image: go-ecommerce-image
-          imagePullPolicy: IfNotPresent
+          image: yigitsilto/gocommerce1.0.0:latest
+          imagePullPolicy: Always
           ports:
             - containerPort: 8443
