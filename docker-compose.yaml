@@ -2,25 +2,25 @@ version: '3.8'
 
 services:
   go:
-    image: go
+    image: go-peynirciler
     build:
       context: .
       dockerfile: ./Dockerfile
     deploy:
-      replicas: 3
-    ports:
-      - "8443-8445:8443"
-
-  nginx:
-    image: nginx
-    ports:
-      - "8081:8081"
-    deploy:
       replicas: 1
-    configs:
-      - source: nginx_conf
-        target: /etc/nginx/nginx.conf
+    ports:
+      - "3001:3001"
 
-configs:
-  nginx_conf:
-    file: ./nginx.conf
+  #nginx:
+   # image: nginx
+   # ports:
+   #   - "8081:8081"
+   # deploy:
+   #   replicas: 1
+    #configs:
+    #  - source: nginx_conf
+    #    target: /etc/nginx/nginx.conf
+
+#configs:
+#  nginx_conf:
+#    file: ./nginx.conf

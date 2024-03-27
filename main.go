@@ -38,8 +38,8 @@ func main() {
 
 	routes.RegisterRoutes(app)
 
-	app.ListenTLS(":8443", "./cert.cert", "key.key")
-	//log.Fatal(app.Listen(":8443"))
+	app.ListenTLS(":3001", "./cert.cert", "key.key")
+	//log.Fatal(app.Listen(":3001"))
 }
 
 func loadDatabase() {
