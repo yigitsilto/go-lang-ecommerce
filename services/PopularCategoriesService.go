@@ -28,14 +28,14 @@ func NewPopularCategoriesService(
 
 func (h *PopularCategoriesServiceImpl) GetPopularCategories() ([]dto.PopularCategoryModel, error) {
 
-	var popularCategories []dto.PopularCategoryModel
-	var err error
+	//var popularCategories []dto.PopularCategoryModel
+	//var err error
 
-	popularCategories, err = h.retrieveDataFromCache(popularCategories)
+	/*popularCategories, err = h.retrieveDataFromCache(popularCategories)
 
 	if err == nil {
 		return popularCategories, nil
-	}
+	}*/
 
 	return h.popularProductRepository.GetAllPopularCategories()
 

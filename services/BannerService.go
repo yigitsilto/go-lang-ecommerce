@@ -4,7 +4,6 @@ import (
 	"ecommerce/Repositories"
 	"ecommerce/config"
 	model "ecommerce/dto"
-	"encoding/json"
 )
 
 type BannerService interface {
@@ -27,16 +26,17 @@ func (s *BannerServiceImpl) GetBanners() ([]model.Banner, error) {
 
 	var banners []model.Banner
 
-	redis, err := s.redisClient.Get("banners")
+	//redis, err := s.redisClient.Get("banners")
+	var err error
+	//	if err != nil {
+	banners, err = s.repository.GetBanners()
+	//bannersValue, _ := json.Marshal(banners)
+	//s.redisClient.Set("banners", string(bannersValue))
 
-	if err != nil {
-		banners, err = s.repository.GetBanners()
-		bannersValue, _ := json.Marshal(banners)
-		s.redisClient.Set("banners", string(bannersValue))
-
-	} else {
-		err = json.Unmarshal([]byte(redis), &banners)
-	}
+	//	}
+	//else {
+	//	err = json.Unmarshal([]byte(redis), &banners)
+	//}
 
 	return banners, err
 }
