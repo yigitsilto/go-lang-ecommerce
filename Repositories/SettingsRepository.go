@@ -166,7 +166,7 @@ func (s *SettingsRepositoryImpl) buildMenuTrees(menus []dto.MenuModel) []dto.Men
 	}
 
 	for _, menu := range menus {
-		if menu.ParentId == 6 {
+		if menu.ParentId == 1 {
 			menuTree = append(menuTree, menu)
 		}
 	}
