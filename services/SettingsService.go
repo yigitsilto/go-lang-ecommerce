@@ -4,7 +4,6 @@ import (
 	"ecommerce/Repositories"
 	"ecommerce/config"
 	"ecommerce/dto"
-	"encoding/json"
 )
 
 type SettingsServiceInterface interface {
@@ -24,17 +23,18 @@ func NewSettingsService(
 
 func (s *SettingsServiceImpl) GetSettings() (dto.GeneralSettingsModel, error) {
 
-	redis, err := s.redisClient.Get("settings")
+	//redis, err := s.redisClient.Get("settings")
 	var settings dto.GeneralSettingsModel
+	var err error
+	//if err != nil {
+	settings, err = s.repository.GetSettings()
+	//settingsValue, _ := json.Marshal(settings)
 
-	if err != nil {
-		settings, err = s.repository.GetSettings()
-		settingsValue, _ := json.Marshal(settings)
-
-		s.redisClient.Set("settings", string(settingsValue))
-	} else {
-		err = json.Unmarshal([]byte(redis), &settings)
-	}
+	//s.redisClient.Set("settings", string(settingsValue))
+	//}
+	//else {
+	//		err = json.Unmarshal([]byte(redis), &settings)
+	//}
 
 	return settings, err
 

@@ -4,7 +4,6 @@ import (
 	"ecommerce/Repositories"
 	"ecommerce/config"
 	model "ecommerce/dto"
-	"encoding/json"
 )
 
 type GalleryService interface {
@@ -26,17 +25,17 @@ func NewGalleryService(repository Repositories.GalleryRepository, client *config
 func (s *GalleryServiceImpl) GetGallery() ([]model.Gallery, error) {
 
 	var galleries []model.Gallery
+	var err error
+	//redis, err := s.redisClient.Get("galleries")
 
-	redis, err := s.redisClient.Get("galleries")
+	//if err != nil {
+	galleries, err = s.repository.GetGallery()
+	//	galleriesValue, _ := json.Marshal(galleries)
+	//	s.redisClient.Set("galleries", string(galleriesValue))
 
-	if err != nil {
-		galleries, err = s.repository.GetGallery()
-		galleriesValue, _ := json.Marshal(galleries)
-		s.redisClient.Set("galleries", string(galleriesValue))
-
-	} else {
-		err = json.Unmarshal([]byte(redis), &galleries)
-	}
+	//}else {
+	//	err = json.Unmarshal([]byte(redis), &galleries)
+	//}
 
 	return galleries, err
 }

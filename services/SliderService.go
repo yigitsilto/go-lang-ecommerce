@@ -29,11 +29,11 @@ func NewSliderService(
 
 func (h *SliderServiceImpl) GetSliders() ([]dto.Slider, error) {
 	var sliders []dto.Slider
-	slidersFromCache, err := h.retrieveDataFromCache(sliders)
+	/*slidersFromCache, err := h.retrieveDataFromCache(sliders)
 
 	if err == nil {
 		return slidersFromCache, nil
-	}
+	}*/
 
 	sliderFromDatabase, err := h.retrieveDataFromDatabase(sliders)
 
