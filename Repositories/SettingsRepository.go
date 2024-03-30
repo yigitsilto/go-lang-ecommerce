@@ -125,7 +125,7 @@ func (s *SettingsRepositoryImpl) getFooter1(settingsMap map[string]string) ([]dt
 		).
 		Where(
 			"menus.is_active =? AND mt.name != ? AND menus.id =? AND mi.parent_id = ?", true, "root",
-			settingsMap["storefront_footer_menu_one"], 9,
+			settingsMap["storefront_footer_menu_one"], 7,
 		).
 		Find(&menus).
 		Error
@@ -145,7 +145,7 @@ func (s *SettingsRepositoryImpl) getFooter2(settingsMap map[string]string) ([]dt
 		).
 		Where(
 			"menus.is_active =? AND mt.name != ? AND menus.id =? AND mi.parent_id = ?", true, "root",
-			settingsMap["storefront_footer_menu_two"], 12,
+			settingsMap["storefront_footer_menu_two"], 9,
 		).
 		Find(&menus).
 		Error
