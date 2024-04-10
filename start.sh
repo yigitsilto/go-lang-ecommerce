@@ -11,13 +11,12 @@ fi
 
 
 if [ "$(git rev-parse --abbrev-ref HEAD)" = "main" ]; then
-  if [ -z "$(docker images -q gocommercekore:latest 2>/dev/null)" ]; then
+    docker stack rm gokore
     docker build -t gocommercekore --no-cache -f Dockerfile .
-  fi
+
 elif [ "$(git rev-parse --abbrev-ref HEAD)" = "peynirciler" ]; then
-  if [ -z "$(docker images -q gocommercepeynirciler:latest 2>/dev/null)" ]; then
+    docker stack rm gopeynirciler
     docker build -t gocommercepeynirciler --no-cache -f Dockerfile .
-  fi
 fi
 
 if [ "$(git rev-parse --abbrev-ref HEAD)" = "main" ]; then
