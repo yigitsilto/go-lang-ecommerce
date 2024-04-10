@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   go:
-    image: go-kore
+    image: gocommercekore
     build:
       context: .
       dockerfile: ./Dockerfile
