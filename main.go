@@ -7,6 +7,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/joho/godotenv"
 	"log"
+	"os"
 )
 
 func CORSMiddleware() fiber.Handler {
@@ -39,7 +40,7 @@ func main() {
 	routes.RegisterRoutes(app)
 
 	//app.ListenTLS(":8443", "./cert.cert", "key.key")
-	log.Fatal(app.Listen(":3002"))
+	log.Fatal(app.Listen(os.Getenv("WORKER_PORT")))
 }
 
 func loadDatabase() {
