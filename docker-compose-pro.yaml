@@ -1,0 +1,10 @@
+version: '3.8'
+
+services:
+  go:
+    image: gocommercepro
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    ports:
+      - "3003:3003"

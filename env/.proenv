@@ -1,0 +1,18 @@
+# Database credentials
+DB_HOST="188.132.200.22"
+DB_USER="proshoparena_proshop"
+DB_PASSWORD="VZJuY75F3YMs6WYd6JQt"
+DB_NAME="proshoparena_proshop"
+DB_PORT="3306"
+IMAGE_APP_URL = "https://backend.proshoparena.com/storage/"
+REDIS_ADDR = "127.0.0.1:6382"
+REDIS_PASSWORD = root
+REDIS_DATABASE = 0
+JWT_SECRET="4ruYgZPR6DuhlMZU0kTUBkNMzuE5e1KFh0jNvMdUyG8lo9xq10g7iChetp9escvp"
+WORKER_PORT=:3003
+
+
+
+
+
+

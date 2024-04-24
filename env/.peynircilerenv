@@ -1,0 +1,18 @@
+# Database credentials
+DB_HOST="188.132.200.22"
+DB_USER="kaytanlar_kaytan"
+DB_PASSWORD="E9GWJshCvq5cFt2cN83r"
+DB_NAME="kaytanlar_kaytan"
+DB_PORT="3306"
+IMAGE_APP_URL = "https://backend.kaytanlarpeynircilik.com/storage/"
+REDIS_ADDR = "127.0.0.1:6379"
+REDIS_PASSWORD = root
+REDIS_DATABASE = 0
+JWT_SECRET="4ruYgZPR6DuhlMZU0kTUBkNMzuE5e1KFh0jNvMdUyG8lo9xq10g7iChetp9escvp"
+WORKER_PORT=:8000
+
+
+
+
+
+
