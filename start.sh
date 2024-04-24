@@ -9,7 +9,6 @@ if [ ! -f .env ]; then
   fi
  elif [ "$(git rev-parse --abbrev-ref HEAD)" = "proshop" ]; then
      cp env/.proenv .env
-   fi
 fi
 
 
