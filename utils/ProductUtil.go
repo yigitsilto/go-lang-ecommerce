@@ -33,6 +33,7 @@ func (pu *ProductUtilImpl) BuildProducts(products []dto.Product, companyId int) 
 		if product.SecondImage != "" {
 			products[index].SecondImage = os.Getenv("IMAGE_APP_URL") + product.SecondImage
 		}
+
 	}
 }
 
